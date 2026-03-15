@@ -1,0 +1,2653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Nexus — sit24cs034 & brison007</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   VARIABLES & RESET
+══════════════════════════════════════════ */
+:root {
+  --bg:       #07080f;
+  --bg2:      #0e0f1a;
+  --bg3:      #151625;
+  --bg4:      #1c1d30;
+  --glass:    rgba(255,255,255,0.03);
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --text:     #dde1f0;
+  --dim:      #6b7099;
+  --muted:    #3a3c56;
+  --a:        #7c6bff;        /* violet accent */
+  --a2:       #b06bff;        /* purple */
+  --cyan:     #00e5cc;
+  --green:    #00d68f;
+  --yellow:   #ffca3a;
+  --red:      #ff4f6e;
+  --easy:     #00d68f;
+  --medium:   #ffca3a;
+  --hard:     #ff4f6e;
+  --arav-c:   #7c6bff;
+  --brison-c: #00e5cc;
+  --r:        12px;
+  --r2:       8px;
+  --shadow:   0 8px 32px rgba(0,0,0,0.5);
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Syne',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* Noise grain overlay */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:9999; opacity:.5;
+}
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--bg2); }
+::-webkit-scrollbar-thumb { background:var(--a); border-radius:4px; }
+
+/* ══════════════════════════════════════════
+   TYPOGRAPHY HELPERS
+══════════════════════════════════════════ */
+.mono { font-family:'Fira Code',monospace; }
+.grad { background:linear-gradient(135deg,var(--a),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.grad2 { background:linear-gradient(135deg,var(--a2),var(--a)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+/* ══════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════ */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:12px 22px; border:none; border-radius:var(--r2);
+  font-family:'Syne',sans-serif; font-size:14px; font-weight:600;
+  cursor:pointer; transition:all .2s; text-decoration:none; white-space:nowrap;
+}
+.btn-primary { background:linear-gradient(135deg,var(--a),var(--a2)); color:#fff; box-shadow:0 4px 20px rgba(124,107,255,.35); }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(124,107,255,.5); }
+.btn-cyan { background:linear-gradient(135deg,var(--cyan),#00b5a0); color:#000; }
+.btn-cyan:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,229,204,.4); }
+.btn-ghost { background:var(--glass); border:1px solid var(--border2); color:var(--text); }
+.btn-ghost:hover { background:rgba(255,255,255,.07); border-color:var(--a); }
+.btn-danger { background:rgba(255,79,110,.15); color:var(--red); border:1px solid rgba(255,79,110,.3); }
+.btn-danger:hover { background:rgba(255,79,110,.3); }
+.btn-sm { padding:7px 14px; font-size:12px; }
+.btn-xs { padding:4px 10px; font-size:11px; border-radius:6px; }
+.btn-full { width:100%; }
+
+/* ══════════════════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════════════════ */
+.field { margin-bottom:18px; }
+.field label {
+  display:block; font-size:11px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--dim); margin-bottom:7px;
+}
+.field input, .field select, .field textarea {
+  width:100%; background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--r2); color:var(--text);
+  font-family:'Syne',sans-serif; font-size:14px;
+  padding:11px 14px; outline:none; transition:border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--a); box-shadow:0 0 0 3px rgba(124,107,255,.15);
+}
+.field select option { background:var(--bg3); }
+.field textarea { min-height:100px; resize:vertical; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; }
+.field input[type="password"] { letter-spacing:.1em; }
+
+/* Input with addon */
+.input-addon { position:relative; }
+.input-addon input { padding-right:100px; }
+.input-addon .addon-btn {
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  padding:6px 12px; font-size:12px; border-radius:6px; font-weight:700;
+}
+
+/* ══════════════════════════════════════════
+   CARDS / PANELS
+══════════════════════════════════════════ */
+.card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--r); padding:24px;
+}
+.card-title {
+  font-size:15px; font-weight:700; margin-bottom:18px;
+  display:flex; align-items:center; gap:8px;
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+#toast {
+  position:fixed; bottom:24px; right:24px; z-index:99999;
+  background:var(--bg3); border:1px solid var(--border2);
+  border-radius:var(--r2); padding:12px 20px;
+  font-size:13px; font-weight:600;
+  box-shadow:var(--shadow);
+  transform:translateY(80px); opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none; max-width:320px;
+  display:flex; align-items:center; gap:8px;
+}
+#toast.show { transform:translateY(0); opacity:1; }
+#toast.t-ok  { border-color:rgba(0,214,143,.4); }
+#toast.t-err { border-color:rgba(255,79,110,.4); }
+#toast.t-info { border-color:rgba(124,107,255,.4); }
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-bg {
+  position:fixed; inset:0; background:rgba(0,0,0,.75);
+  z-index:1000; display:none; align-items:center; justify-content:center;
+  padding:20px; backdrop-filter:blur(4px);
+}
+.modal-bg.open { display:flex; }
+.modal {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:16px; padding:30px;
+  width:100%; max-width:460px;
+  animation:popIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn { from { transform:scale(.88); opacity:0; } to { transform:scale(1); opacity:1; } }
+.modal h3 { font-size:20px; font-weight:800; margin-bottom:6px; }
+.modal p.modal-sub { color:var(--dim); font-size:13px; margin-bottom:22px; }
+.modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+
+/* ══════════════════════════════════════════
+   BADGE
+══════════════════════════════════════════ */
+.badge {
+  display:inline-flex; align-items:center;
+  padding:3px 10px; border-radius:99px;
+  font-size:11px; font-weight:700; letter-spacing:.04em;
+}
+.badge-easy   { background:rgba(0,214,143,.15); color:var(--easy); }
+.badge-medium { background:rgba(255,202,58,.15); color:var(--medium); }
+.badge-hard   { background:rgba(255,79,110,.15); color:var(--hard); }
+.badge-a { background:rgba(124,107,255,.15); color:var(--a); }
+.badge-cyan { background:rgba(0,229,204,.12); color:var(--cyan); }
+
+/* ══════════════════════════════════════════
+   ██ LOGIN PAGE
+══════════════════════════════════════════ */
+#pg-login {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:24px; position:relative;
+}
+#pg-login::before {
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 700px 500px at 15% 20%, rgba(124,107,255,.12) 0%, transparent 65%),
+    radial-gradient(ellipse 600px 400px at 85% 80%, rgba(0,229,204,.08) 0%, transparent 65%);
+  pointer-events:none;
+}
+.login-shell { width:100%; max-width:420px; position:relative; }
+.login-brand { text-align:center; margin-bottom:32px; }
+.login-brand .logo-ring {
+  width:72px; height:72px; border-radius:50%;
+  background:linear-gradient(135deg,var(--a),var(--cyan));
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px; margin:0 auto 14px;
+  box-shadow:0 0 40px rgba(124,107,255,.4);
+  animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 0 40px rgba(124,107,255,.4)} 50%{box-shadow:0 0 60px rgba(124,107,255,.7)} }
+.login-brand h1 { font-size:28px; font-weight:800; }
+.login-brand h1 span { color:var(--dim); font-weight:400; font-size:14px; display:block; margin-top:3px; }
+.login-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:16px; padding:32px;
+  box-shadow:var(--shadow);
+}
+.login-tabs { display:flex; gap:8px; margin-bottom:24px; }
+.login-tab {
+  flex:1; padding:10px; border-radius:var(--r2);
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--dim); font-family:'Syne',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; text-align:center; transition:all .2s;
+}
+.login-tab.active { background:rgba(124,107,255,.15); border-color:var(--a); color:var(--text); }
+.err-msg { color:var(--red); font-size:13px; margin-top:10px; display:none; text-align:center; }
+.ok-msg  { color:var(--green); font-size:13px; margin-top:10px; display:none; text-align:center; }
+.divider { text-align:center; color:var(--muted); font-size:12px; margin:16px 0; position:relative; }
+.divider::before, .divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--border); }
+.divider::before { left:0; } .divider::after { right:0; }
+/* OTP boxes */
+.otp-boxes { display:flex; gap:8px; justify-content:center; margin:14px 0; }
+.otp-box {
+  width:46px; height:52px; background:var(--bg3);
+  border:1px solid var(--border); border-radius:var(--r2);
+  color:var(--text); font-family:'Fira Code',monospace; font-size:22px; font-weight:700;
+  text-align:center; outline:none; transition:border-color .2s;
+}
+.otp-box:focus { border-color:var(--a); box-shadow:0 0 0 3px rgba(124,107,255,.15); }
+.forgot-link { color:var(--a); font-size:12px; cursor:pointer; text-align:right; display:block; margin-top:-10px; margin-bottom:14px; }
+.forgot-link:hover { text-decoration:underline; }
+
+/* ══════════════════════════════════════════
+   ██ APP SHELL
+══════════════════════════════════════════ */
+#pg-app { display:none; min-height:100vh; }
+.app-layout { display:flex; min-height:100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:252px; min-height:100vh;
+  background:var(--bg2); border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  position:fixed; left:0; top:0; z-index:200;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.sb-logo { padding:22px 20px 18px; border-bottom:1px solid var(--border); }
+.sb-logo h2 { font-size:18px; font-weight:800; }
+.sb-logo h2 small { color:var(--dim); font-weight:400; font-size:12px; display:block; margin-top:2px; }
+
+.sb-user { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:11px; cursor:pointer; }
+.sb-user:hover { background:var(--glass); }
+.av {
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; font-weight:800; flex-shrink:0;
+}
+.av-arav   { background:linear-gradient(135deg,var(--arav-c),#b06bff); }
+.av-brison { background:linear-gradient(135deg,var(--brison-c),#0099cc); }
+.av-ai     { background:linear-gradient(135deg,#ff6b9d,#ff4f6e); }
+.sb-user-info .name { font-size:14px; font-weight:700; }
+.sb-user-info .role { font-size:11px; color:var(--dim); }
+
+.sb-nav { padding:12px 10px; flex:1; overflow-y:auto; }
+.nav-section { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; padding:8px 12px 4px; margin-top:4px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 13px; border-radius:var(--r2);
+  color:var(--dim); font-size:13px; font-weight:600;
+  cursor:pointer; transition:all .15s;
+  margin-bottom:2px; border:1px solid transparent;
+  position:relative;
+}
+.nav-item:hover { background:var(--glass); color:var(--text); }
+.nav-item.active { background:rgba(124,107,255,.12); color:var(--a); border-color:rgba(124,107,255,.2); }
+.nav-item .ni { font-size:16px; width:22px; text-align:center; flex-shrink:0; }
+.nav-badge {
+  margin-left:auto; background:var(--a);
+  color:#fff; border-radius:99px; font-size:10px; font-weight:800;
+  padding:2px 7px; min-width:20px; text-align:center;
+}
+.nav-badge.nb-red { background:var(--red); }
+.nav-badge.nb-cyan { background:var(--cyan); color:#000; }
+
+.sb-footer { padding:14px 12px; border-top:1px solid var(--border); }
+
+/* ── MAIN ── */
+.main { margin-left:252px; flex:1; padding:28px; min-height:100vh; }
+.page-hdr { font-size:22px; font-weight:800; margin-bottom:24px; display:flex; align-items:center; gap:10px; }
+
+/* ── VIEW SYSTEM ── */
+.view { display:none; animation:fadeUp .25s ease; }
+.view.active { display:block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+
+/* HAMBURGER */
+.hamburger {
+  display:none; position:fixed; top:14px; left:14px; z-index:300;
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:8px 10px; cursor:pointer;
+  color:var(--text); font-size:18px;
+}
+@media(max-width:800px) {
+  .hamburger { display:flex; }
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:none; }
+  .main { margin-left:0; padding:16px; padding-top:56px; }
+}
+
+/* ══════════════════════════════════════════
+   ██ DASHBOARD
+══════════════════════════════════════════ */
+.stats-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:14px; margin-bottom:24px;
+}
+.stat-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--r); padding:20px 22px;
+  position:relative; overflow:hidden;
+  transition:border-color .2s, transform .2s;
+}
+.stat-card:hover { transform:translateY(-2px); }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.stat-card.sc-easy::before   { background:var(--easy); }
+.stat-card.sc-medium::before { background:var(--medium); }
+.stat-card.sc-hard::before   { background:var(--hard); }
+.stat-card.sc-total::before  { background:linear-gradient(90deg,var(--a),var(--cyan)); }
+.stat-card.sc-streak::before { background:linear-gradient(90deg,var(--yellow),var(--red)); }
+.stat-num { font-family:'Fira Code',monospace; font-size:38px; font-weight:700; line-height:1; margin-bottom:5px; }
+.sc-easy .stat-num   { color:var(--easy); }
+.sc-medium .stat-num { color:var(--medium); }
+.sc-hard .stat-num   { color:var(--hard); }
+.sc-total .stat-num  { color:var(--a); }
+.sc-streak .stat-num { color:var(--yellow); }
+.stat-lbl { font-size:12px; color:var(--dim); }
+.stat-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:30px; opacity:.1; }
+
+/* Heatmap */
+.heatmap-grid { display:flex; flex-wrap:wrap; gap:3px; margin-top:10px; }
+.hc { width:13px; height:13px; border-radius:3px; background:var(--bg3); border:1px solid var(--border); cursor:pointer; transition:transform .1s; }
+.hc:hover { transform:scale(1.3); }
+.hc.h1 { background:rgba(124,107,255,.28); border-color:rgba(124,107,255,.4); }
+.hc.h2 { background:rgba(124,107,255,.55); border-color:rgba(124,107,255,.6); }
+.hc.h3 { background:rgba(124,107,255,.8); border-color:var(--a); }
+.hc.h4 { background:var(--a); border-color:var(--a); box-shadow:0 0 6px rgba(124,107,255,.6); }
+.hm-legend { display:flex; align-items:center; gap:5px; margin-top:8px; font-size:11px; color:var(--dim); }
+.hm-legend .hc { cursor:default; }
+
+/* ══════════════════════════════════════════
+   ██ PROBLEMS
+══════════════════════════════════════════ */
+.form-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.form-grid2 .span2 { grid-column:1/-1; }
+@media(max-width:600px) { .form-grid2 { grid-template-columns:1fr; } .form-grid2 .span2 { grid-column:1; } }
+
+.filter-tabs { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
+.ftab {
+  padding:7px 16px; border-radius:99px;
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--dim); font-family:'Syne',sans-serif;
+  font-size:12px; font-weight:700; cursor:pointer; transition:all .2s;
+}
+.ftab:hover { border-color:var(--border2); color:var(--text); }
+.ftab.ft-all    { background:rgba(124,107,255,.12); border-color:var(--a); color:var(--a); }
+.ftab.ft-easy   { background:rgba(0,214,143,.1); border-color:var(--easy); color:var(--easy); }
+.ftab.ft-medium { background:rgba(255,202,58,.1); border-color:var(--medium); color:var(--medium); }
+.ftab.ft-hard   { background:rgba(255,79,110,.1); border-color:var(--hard); color:var(--hard); }
+.ftab.ft-rev    { background:rgba(0,229,204,.08); border-color:var(--cyan); color:var(--cyan); }
+
+.search-row { position:relative; margin-bottom:16px; }
+.search-row input { width:100%; padding:10px 14px 10px 38px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r2); color:var(--text); font-family:'Syne',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
+.search-row input:focus { border-color:var(--a); }
+.search-row .si { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+
+/* Problem card */
+.prob-card {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--r); margin-bottom:12px;
+  overflow:hidden; transition:border-color .2s, box-shadow .2s;
+}
+.prob-card:hover { border-color:rgba(255,255,255,.12); box-shadow:0 4px 24px rgba(0,0,0,.35); }
+.prob-card.d-easy   { border-left:3px solid var(--easy); }
+.prob-card.d-medium { border-left:3px solid var(--medium); }
+.prob-card.d-hard   { border-left:3px solid var(--hard); }
+.prob-head {
+  padding:15px 18px; display:flex; align-items:center; gap:12px;
+  cursor:pointer; user-select:none;
+}
+.prob-num { font-family:'Fira Code',monospace; font-size:11px; color:var(--muted); margin-bottom:2px; }
+.prob-name { font-size:15px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:360px; }
+.prob-meta { display:flex; align-items:center; gap:7px; margin-left:auto; flex-shrink:0; flex-wrap:wrap; }
+.prob-date { font-size:11px; color:var(--muted); font-family:'Fira Code',monospace; }
+.expand-chevron { color:var(--dim); font-size:12px; transition:transform .2s; }
+.prob-card.open .expand-chevron { transform:rotate(180deg); }
+.prob-body { display:none; border-top:1px solid var(--border); padding:16px 18px; }
+.prob-card.open .prob-body { display:block; }
+.code-lbl { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; margin-top:12px; }
+.code-block {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:var(--r2); padding:14px;
+  font-family:'Fira Code',monospace; font-size:12.5px;
+  line-height:1.75; white-space:pre-wrap; word-break:break-word;
+  color:#c8cde0; overflow-x:auto; max-height:320px; overflow-y:auto;
+}
+.prob-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.tag-pill { padding:2px 9px; border-radius:99px; font-size:11px; background:rgba(124,107,255,.1); color:var(--a); border:1px solid rgba(124,107,255,.2); }
+.prob-actions { display:flex; gap:7px; margin-top:14px; flex-wrap:wrap; }
+
+/* ══════════════════════════════════════════
+   ██ CHAT
+══════════════════════════════════════════ */
+.chat-shell { display:flex; flex-direction:column; height:calc(100vh - 150px); min-height:400px; }
+.chat-hdr {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--r) var(--r) 0 0;
+  padding:14px 20px; display:flex; align-items:center; gap:12px;
+}
+.chat-hdr-avs { display:flex; }
+.chat-hdr-avs .av { width:28px; height:28px; font-size:11px; margin-right:-5px; border:2px solid var(--bg2); }
+.chat-hdr-title { font-weight:700; font-size:14px; }
+.chat-hdr-sub { font-size:11px; color:var(--dim); }
+.chat-online { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:12px; color:var(--green); }
+.online-dot { width:7px; height:7px; background:var(--green); border-radius:50%; animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.chat-body {
+  flex:1; overflow-y:auto;
+  background:var(--bg3); border:1px solid var(--border); border-top:none;
+  padding:20px; display:flex; flex-direction:column; gap:14px;
+}
+.msg { display:flex; gap:9px; max-width:80%; }
+.msg.mine { flex-direction:row-reverse; margin-left:auto; }
+.msg .mav { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; flex-shrink:0; }
+.msg-wrap { display:flex; flex-direction:column; gap:3px; }
+.msg.mine .msg-wrap { align-items:flex-end; }
+.msg-sender { font-size:10px; color:var(--dim); }
+.bubble {
+  padding:9px 14px; border-radius:16px;
+  font-size:13.5px; line-height:1.6; word-break:break-word; max-width:100%;
+}
+.msg.theirs .bubble { background:var(--bg4); border:1px solid var(--border); border-bottom-left-radius:3px; }
+.msg.mine .bubble { background:linear-gradient(135deg,var(--a),var(--a2)); color:#fff; border-bottom-right-radius:3px; }
+.msg.ai-msg .bubble { background:rgba(0,229,204,.08); border:1px solid rgba(0,229,204,.2); border-bottom-left-radius:3px; font-family:'Fira Code',monospace; font-size:12px; }
+.bubble.code-bubble { font-family:'Fira Code',monospace; font-size:12px; background:var(--bg) !important; border:1px solid var(--border) !important; color:#c8cde0 !important; white-space:pre-wrap; }
+.msg-time { font-size:10px; color:var(--muted); font-family:'Fira Code',monospace; }
+.ai-tag { display:inline-flex; align-items:center; gap:4px; font-size:10px; background:rgba(0,229,204,.12); color:var(--cyan); padding:2px 7px; border-radius:4px; margin-bottom:4px; }
+
+.chat-typing-row {
+  display:none; padding:8px 20px;
+  background:var(--bg3); border:1px solid var(--border); border-top:none;
+}
+.typing-bubble { background:var(--bg4); border:1px solid var(--border); border-radius:12px; padding:9px 14px; display:inline-flex; gap:4px; align-items:center; }
+.td { width:5px; height:5px; border-radius:50%; background:var(--dim); animation:tdance 1.2s infinite; }
+.td:nth-child(2){animation-delay:.2s} .td:nth-child(3){animation-delay:.4s}
+@keyframes tdance { 0%,80%,100%{transform:scale(.7);opacity:.4} 40%{transform:scale(1);opacity:1} }
+
+.chat-footer {
+  background:var(--bg2); border:1px solid var(--border); border-top:none;
+  border-radius:0 0 var(--r) var(--r); padding:12px 14px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.chat-tools { display:flex; gap:6px; flex-wrap:wrap; }
+.ctool {
+  padding:4px 11px; border-radius:99px;
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--dim); font-family:'Syne',sans-serif; font-size:11px; font-weight:600;
+  cursor:pointer; transition:all .15s;
+}
+.ctool:hover { background:var(--bg4); color:var(--text); border-color:var(--border2); }
+.ctool.ai { border-color:rgba(0,229,204,.3); color:var(--cyan); }
+.chat-input-row { display:flex; gap:8px; align-items:flex-end; }
+.chat-input-row textarea {
+  flex:1; background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--r2); color:var(--text); font-family:'Syne',sans-serif;
+  font-size:13px; padding:10px 13px; resize:none; max-height:100px;
+  outline:none; transition:border-color .2s; min-height:40px;
+}
+.chat-input-row textarea:focus { border-color:var(--a); }
+
+/* ══════════════════════════════════════════
+   ██ DOUBT SOLVER
+══════════════════════════════════════════ */
+.topic-grid { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+.topic-chip {
+  padding:6px 14px; border-radius:99px;
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--dim); font-family:'Syne',sans-serif; font-size:12px; font-weight:600;
+  cursor:pointer; transition:all .15s;
+}
+.topic-chip:hover,.topic-chip.sel { background:rgba(124,107,255,.12); color:var(--a); border-color:var(--a); }
+.doubt-row { display:flex; gap:10px; align-items:flex-end; }
+.doubt-row textarea { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r2); color:var(--text); font-family:'Syne',sans-serif; font-size:13px; padding:11px 14px; resize:none; height:88px; outline:none; transition:border-color .2s; }
+.doubt-row textarea:focus { border-color:var(--a); }
+.ans-block {
+  background:var(--bg3); border:1px solid rgba(0,229,204,.25);
+  border-radius:var(--r); padding:20px; display:none; margin-top:0;
+}
+.ans-hdr { display:flex; align-items:center; gap:8px; margin-bottom:12px; color:var(--cyan); font-weight:700; font-size:14px; }
+.ans-body { font-size:14px; line-height:1.8; color:var(--text); }
+.ans-body code { font-family:'Fira Code',monospace; background:var(--bg); padding:2px 6px; border-radius:4px; font-size:12px; color:var(--cyan); }
+.dots { display:inline-flex; gap:3px; }
+.dots span { width:5px; height:5px; border-radius:50%; background:var(--cyan); animation:tdance 1.2s infinite; }
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+
+.dh-item { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r2); padding:13px 16px; margin-bottom:9px; cursor:pointer; transition:border-color .2s; }
+.dh-item:hover { border-color:var(--border2); }
+.dh-q { font-size:13px; font-weight:600; }
+.dh-preview { font-size:12px; color:var(--dim); margin-top:5px; font-family:'Fira Code',monospace; display:none; }
+
+/* ══════════════════════════════════════════
+   ██ PROFILE
+══════════════════════════════════════════ */
+.profile-hero {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--r); padding:28px;
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  margin-bottom:20px; position:relative; overflow:hidden;
+}
+.profile-hero::before {
+  content:'';
+  position:absolute; top:-50px; right:-50px;
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle, rgba(124,107,255,.15), transparent 70%);
+}
+.profile-av-lg {
+  width:80px; height:80px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px; font-weight:800; flex-shrink:0;
+  box-shadow:0 0 30px rgba(124,107,255,.4);
+}
+.profile-info h2 { font-size:22px; font-weight:800; }
+.profile-info p { color:var(--dim); font-size:13px; margin-top:3px; }
+.profile-info .p-since { font-size:11px; color:var(--muted); font-family:'Fira Code',monospace; margin-top:6px; }
+.profile-stats { margin-left:auto; display:flex; gap:20px; flex-wrap:wrap; }
+.pstat { text-align:center; }
+.pstat-n { font-family:'Fira Code',monospace; font-size:26px; font-weight:700; }
+.pstat-l { font-size:11px; color:var(--dim); }
+
+.rank-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:22px; }
+.rank-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(124,107,255,.12); border:1px solid rgba(124,107,255,.3);
+  border-radius:99px; padding:6px 18px; font-weight:700; font-size:15px;
+}
+.achiev-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; }
+.achiev-card {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--r2); padding:14px; text-align:center;
+  transition:border-color .2s;
+}
+.achiev-card.earned { border-color:rgba(124,107,255,.4); }
+.achiev-card .ac-icon { font-size:28px; margin-bottom:6px; }
+.achiev-card .ac-name { font-size:12px; font-weight:700; }
+.achiev-card .ac-desc { font-size:11px; color:var(--dim); margin-top:2px; }
+.achiev-card:not(.earned) { opacity:.4; filter:grayscale(1); }
+
+/* ══════════════════════════════════════════
+   ██ LEADERBOARD
+══════════════════════════════════════════ */
+.lb-row {
+  display:flex; align-items:center; gap:14px;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--r2); padding:14px 18px; margin-bottom:10px;
+  transition:border-color .2s;
+}
+.lb-row.lb-me { border-color:rgba(124,107,255,.4); background:rgba(124,107,255,.05); }
+.lb-rank-num { font-family:'Fira Code',monospace; font-size:20px; font-weight:700; width:32px; text-align:center; }
+.rank-gold { color:#f5a623; } .rank-silver { color:#94a3b8; } .rank-bronze { color:#cd7f32; }
+.lb-name { font-size:14px; font-weight:700; }
+.lb-stats { font-size:12px; color:var(--dim); }
+.lb-score { font-family:'Fira Code',monospace; font-size:22px; font-weight:700; color:var(--a); margin-left:auto; }
+
+/* ══════════════════════════════════════════
+   ██ PROGRESS
+══════════════════════════════════════════ */
+.prog-bar-bg { background:var(--border); border-radius:99px; overflow:hidden; }
+.prog-fill { border-radius:99px; transition:width .6s cubic-bezier(.4,0,.2,1); }
+.prog-row { margin-bottom:18px; }
+.prog-info { display:flex; justify-content:space-between; font-size:12px; color:var(--dim); margin-bottom:6px; }
+
+/* ══════════════════════════════════════════
+   ██ SETTINGS
+══════════════════════════════════════════ */
+.setting-row {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--r2); padding:14px 18px; margin-bottom:10px;
+}
+.setting-row h4 { font-size:14px; font-weight:700; margin-bottom:2px; }
+.setting-row p { font-size:12px; color:var(--dim); }
+.toggle { position:relative; width:42px; height:23px; display:inline-block; cursor:pointer; }
+.toggle input { opacity:0; width:0; height:0; }
+.tog-sl { position:absolute; inset:0; background:var(--muted); border-radius:99px; transition:.2s; }
+.tog-sl::before { content:''; position:absolute; width:17px; height:17px; left:3px; top:3px; border-radius:50%; background:#fff; transition:.2s; }
+.toggle input:checked + .tog-sl { background:var(--a); }
+.toggle input:checked + .tog-sl::before { transform:translateX(19px); }
+
+/* ══════════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════════ */
+.empty { text-align:center; padding:48px; color:var(--dim); }
+.empty .ei { font-size:48px; margin-bottom:12px; }
+
+/* ══════════════════════════════════════════
+   FORGOT / OTP SECTION
+══════════════════════════════════════════ */
+.step { display:none; }
+.step.active { display:block; }
+.phone-hint { font-size:11px; color:var(--dim); margin-top:4px; }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ████████████████████████████████████████
+     LOGIN PAGE
+████████████████████████████████████████ -->
+<div id="pg-login">
+  <div class="login-shell">
+    <div class="login-brand">
+      <div class="logo-ring">🧠</div>
+      <h1 class="grad">DSA Nexus</h1>
+      <span style="color:var(--dim);font-size:13px">Your algorithm mastery hub</span>
+    </div>
+    <div class="login-card">
+
+      <!-- TABS: Login | Forgot Password -->
+      <div id="loginSection">
+        <div class="login-tabs" id="userTabs">
+          <button class="login-tab active" onclick="switchUser('arav',this)">🎯 sit24cs034</button>
+          <button class="login-tab" onclick="switchUser('brison',this)">⚡ brison007</button>
+        </div>
+
+        <form id="loginForm">
+          <div class="field">
+            <label>User ID</label>
+            <input type="text" id="loginId" placeholder="Enter your ID" autocomplete="off" required>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="loginPw" placeholder="Enter password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Sign In →</button>
+          <p class="err-msg" id="loginErr">❌ Invalid credentials. Try again.</p>
+        </form>
+
+        <div class="divider">or</div>
+        <button class="btn btn-ghost btn-full" onclick="showForgot()">🔑 Forgot Password? Reset via OTP</button>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div id="forgotSection" style="display:none">
+        <h3 style="margin-bottom:5px">Reset Password</h3>
+        <p style="color:var(--dim);font-size:13px;margin-bottom:20px">We'll send a 6-digit OTP to your registered number</p>
+
+        <!-- Step 1: Select user + send OTP -->
+        <div class="step active" id="fstep1">
+          <div class="field">
+            <label>Select Account</label>
+            <select id="forgotUser">
+              <option value="sit24cs034">sit24cs034 (Arav)</option>
+              <option value="brison007">brison007 (Brison)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Registered Phone Number</label>
+            <input type="tel" id="forgotPhone" placeholder="e.g. 9876543210">
+            <p class="phone-hint">Registered: sit24cs034 → ****3456 | brison007 → ****7890</p>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="sendOTP()">Send OTP →</button>
+          <p class="err-msg" id="f1Err"></p>
+          <p class="ok-msg" id="f1Ok"></p>
+        </div>
+
+        <!-- Step 2: Enter OTP -->
+        <div class="step" id="fstep2">
+          <p style="color:var(--dim);font-size:13px;margin-bottom:14px">Enter the 6-digit OTP sent to your number</p>
+          <div class="otp-boxes" id="otpBoxes">
+            <input class="otp-box" type="text" maxlength="1" oninput="otpMove(this,0)">
+            <input class="otp-box" type="text" maxlength="1" oninput="otpMove(this,1)">
+            <input class="otp-box" type="text" maxlength="1" oninput="otpMove(this,2)">
+            <input class="otp-box" type="text" maxlength="1" oninput="otpMove(this,3)">
+            <input class="otp-box" type="text" maxlength="1" oninput="otpMove(this,4)">
+            <input class="otp-box" type="text" maxlength="1" oninput="otpMove(this,5)">
+          </div>
+          <p id="otpTimerTxt" style="text-align:center;font-size:12px;color:var(--dim);margin-bottom:12px"></p>
+          <button class="btn btn-primary btn-full" onclick="verifyOTP()">Verify OTP →</button>
+          <p class="err-msg" id="f2Err"></p>
+        </div>
+
+        <!-- Step 3: New password -->
+        <div class="step" id="fstep3">
+          <div class="field">
+            <label>New Password</label>
+            <input type="password" id="newPw1" placeholder="Minimum 6 characters" required>
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <input type="password" id="newPw2" placeholder="Repeat new password" required>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="resetPassword()">Set New Password →</button>
+          <p class="err-msg" id="f3Err"></p>
+        </div>
+
+        <button style="margin-top:14px;background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;font-family:'Syne',sans-serif" onclick="backToLogin()">← Back to Login</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ████████████████████████████████████████
+     APP
+████████████████████████████████████████ -->
+<div id="pg-app">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <h2 class="grad">DSA Nexus</h2>
+        <small>Algorithm mastery hub</small>
+      </div>
+      <div class="sb-user" id="sbUser" onclick="showV('profile')"></div>
+      <div class="sb-nav">
+        <div class="nav-section">Main</div>
+        <div class="nav-item active" id="ni-dashboard" onclick="showV('dashboard')"><span class="ni">🏠</span> Dashboard</div>
+        <div class="nav-item" id="ni-problems" onclick="showV('problems')"><span class="ni">📝</span> My Problems <span class="nav-badge" id="nbProb">0</span></div>
+        <div class="nav-item" id="ni-add" onclick="showV('add')"><span class="ni">➕</span> Add Problem</div>
+        <div class="nav-section">Community</div>
+        <div class="nav-item" id="ni-chat" onclick="showV('chat')"><span class="ni">💬</span> Chat Room <span class="nav-badge nb-cyan" id="nbChat" style="display:none">!</span></div>
+        <div class="nav-item" id="ni-doubt" onclick="showV('doubt')"><span class="ni">🤖</span> AI Doubt Solver</div>
+        <div class="nav-section">Insights</div>
+        <div class="nav-item" id="ni-progress" onclick="showV('progress')"><span class="ni">📊</span> Progress</div>
+        <div class="nav-item" id="ni-leaderboard" onclick="showV('leaderboard')"><span class="ni">🏆</span> Leaderboard</div>
+        <div class="nav-section">Account</div>
+        <div class="nav-item" id="ni-profile" onclick="showV('profile')"><span class="ni">👤</span> Profile</div>
+        <div class="nav-item" id="ni-settings" onclick="showV('settings')"><span class="ni">⚙️</span> Settings</div>
+      </div>
+      <div class="sb-footer">
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="logout()">↩ Logout</button>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-hdr">🏠 Dashboard</div>
+        <div class="stats-grid">
+          <div class="stat-card sc-easy"><div class="stat-icon">✅</div><div class="stat-num" id="sc-easy">0</div><div class="stat-lbl">Easy Solved</div></div>
+          <div class="stat-card sc-medium"><div class="stat-icon">⚡</div><div class="stat-num" id="sc-med">0</div><div class="stat-lbl">Medium Solved</div></div>
+          <div class="stat-card sc-hard"><div class="stat-icon">🔥</div><div class="stat-num" id="sc-hard">0</div><div class="stat-lbl">Hard Solved</div></div>
+          <div class="stat-card sc-total"><div class="stat-icon">🎯</div><div class="stat-num" id="sc-total">0</div><div class="stat-lbl">Total Solved</div></div>
+          <div class="stat-card sc-streak"><div class="stat-icon">🔥</div><div class="stat-num" id="sc-streak">0</div><div class="stat-lbl">Day Streak 🔥</div></div>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">📅 Activity — Last 60 Days</div>
+          <div class="heatmap-grid" id="heatmap"></div>
+          <div class="hm-legend" style="margin-top:8px">Less <div class="hc"></div><div class="hc h1"></div><div class="hc h2"></div><div class="hc h3"></div><div class="hc h4"></div> More</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🕐 Recent Problems</div>
+          <div id="recentList"></div>
+        </div>
+      </div>
+
+      <!-- ── MY PROBLEMS ── -->
+      <div class="view" id="view-problems">
+        <div class="page-hdr">📝 My Problems</div>
+        <div class="card">
+          <div class="search-row"><span class="si">🔍</span><input type="text" id="srch" placeholder="Search by title, topic, tags…" oninput="filterProbs()"></div>
+          <div class="filter-tabs">
+            <button class="ftab ft-all" onclick="setF('all',this)">All</button>
+            <button class="ftab" onclick="setF('easy',this)">Easy</button>
+            <button class="ftab" onclick="setF('medium',this)">Medium</button>
+            <button class="ftab" onclick="setF('hard',this)">Hard</button>
+            <button class="ftab" onclick="setF('review',this)">⭐ Review</button>
+          </div>
+          <div id="probList"></div>
+        </div>
+      </div>
+
+      <!-- ── ADD PROBLEM ── -->
+      <div class="view" id="view-add">
+        <div class="page-hdr">➕ Add New Problem</div>
+        <div class="card">
+          <form id="addForm">
+            <div class="form-grid2">
+              <div class="field"><label>Problem Title</label><input type="text" id="pTitle" placeholder="e.g., Two Sum" required></div>
+              <div class="field"><label>Difficulty</label><select id="pDiff" required><option value="">Select…</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></div>
+              <div class="field"><label>Topic / Category</label><select id="pTopic"><option value="">Select topic</option><option>Arrays</option><option>Strings</option><option>Linked List</option><option>Trees</option><option>Graphs</option><option>Dynamic Programming</option><option>Backtracking</option><option>Binary Search</option><option>Stack / Queue</option><option>Heap</option><option>Hashing</option><option>Two Pointers</option><option>Sliding Window</option><option>Greedy</option><option>Math</option><option>Bit Manipulation</option><option>Trie</option><option>Recursion</option><option>Sorting</option><option>Other</option></select></div>
+              <div class="field"><label>Status</label><select id="pStatus"><option value="solved">✅ Solved</option><option value="review">⭐ Mark for Review</option></select></div>
+              <div class="field"><label>Tags (comma separated)</label><input type="text" id="pTags" placeholder="two-pointer, hashmap, BFS"></div>
+              <div class="field"><label>LeetCode / Problem Link</label><input type="url" id="pLink" placeholder="https://leetcode.com/…"></div>
+              <div class="field span2"><label>Problem Statement</label><textarea id="pQ" placeholder="Paste the problem statement here…" style="min-height:120px" required></textarea></div>
+              <div class="field span2"><label>Your Solution</label><textarea id="pSol" placeholder="Paste your solution code…" style="min-height:160px" required></textarea></div>
+              <div class="field span2"><label>Notes / Approach / Complexity</label><textarea id="pNotes" placeholder="Key observations, time/space complexity, approach used…" style="min-height:80px"></textarea></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Problem →</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── CHAT ── -->
+      <div class="view" id="view-chat">
+        <div class="page-hdr">💬 Chat Room</div>
+        <div class="chat-shell">
+          <div class="chat-hdr">
+            <div class="chat-hdr-avs">
+              <div class="av av-arav" style="width:28px;height:28px;font-size:11px">A</div>
+              <div class="av av-brison" style="width:28px;height:28px;font-size:11px">B</div>
+            </div>
+            <div>
+              <div class="chat-hdr-title">sit24cs034 &amp; brison007</div>
+              <div class="chat-hdr-sub">DSA Discussion Channel</div>
+            </div>
+            <div class="chat-online"><div class="online-dot"></div>Live</div>
+          </div>
+          <div class="chat-body" id="chatBody"></div>
+          <div class="chat-typing-row" id="typingRow">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="av av-brison" style="width:24px;height:24px;font-size:10px">B</div>
+              <div class="typing-bubble"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+            </div>
+          </div>
+          <div class="chat-footer">
+            <div class="chat-tools">
+              <button class="ctool" onclick="injectSnip('code')">{ } Code</button>
+              <button class="ctool" onclick="injectSnip('doubt')">❓ Doubt</button>
+              <button class="ctool" onclick="injectSnip('share')">📌 Share</button>
+              <button class="ctool ai" onclick="chatAI()">🤖 Ask AI</button>
+              <button class="ctool" onclick="clearChat()" style="color:var(--red);border-color:rgba(255,79,110,.3)">🗑️ Clear</button>
+            </div>
+            <div class="chat-input-row">
+              <textarea id="chatInput" placeholder="Type a message… (Enter = send | Shift+Enter = new line)" onkeydown="chatKey(event)"></textarea>
+              <button class="btn btn-primary btn-sm" onclick="sendChat()" style="height:40px;width:auto">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── AI DOUBT SOLVER ── -->
+      <div class="view" id="view-doubt">
+        <div class="page-hdr">🤖 AI Doubt Solver</div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-title">💡 Ask Any DSA Concept</div>
+          <p style="font-size:13px;color:var(--dim);margin-bottom:14px">Powered by Claude AI — ask anything about DSA concepts, approaches, complexity, or problems.</p>
+          <div class="topic-grid" id="topicGrid">
+            <span class="topic-chip" onclick="pickTopic(this,'Arrays')">Arrays</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Linked List')">Linked List</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Trees')">Trees</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Graphs')">Graphs</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Dynamic Programming')">DP</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Binary Search')">Binary Search</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Recursion')">Recursion</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Sliding Window')">Sliding Window</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Backtracking')">Backtracking</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Two Pointers')">Two Pointers</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Hashing')">Hashing</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Sorting')">Sorting</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Greedy')">Greedy</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Bit Manipulation')">Bit Manipulation</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Stack / Queue')">Stack / Queue</span>
+            <span class="topic-chip" onclick="pickTopic(this,'Trie')">Trie</span>
+          </div>
+          <div class="doubt-row" style="margin-top:12px">
+            <textarea id="doubtQ" placeholder="e.g., Explain Dijkstra's algorithm with a step-by-step example and tell me its time complexity…"></textarea>
+            <button class="btn btn-cyan btn-sm" style="width:auto;height:50px;align-self:flex-end" onclick="askDoubt()">Ask →</button>
+          </div>
+        </div>
+        <div class="card ans-block" id="ansBlock">
+          <div class="ans-hdr">🤖 Claude AI <span class="dots" id="ansLoad"><span></span><span></span><span></span></span></div>
+          <div class="ans-body" id="ansBody"></div>
+        </div>
+        <div class="card" style="margin-top:18px">
+          <div class="card-title">🕐 Doubt History</div>
+          <div id="doubtHist"></div>
+        </div>
+      </div>
+
+      <!-- ── PROGRESS ── -->
+      <div class="view" id="view-progress">
+        <div class="page-hdr">📊 Progress</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px" class="resp-grid">
+          <div class="card">
+            <div class="card-title">🎯 Difficulty Split</div>
+            <div id="diffBars"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📅 Daily Goal</div>
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+              <div>
+                <div style="font-size:13px;color:var(--dim);margin-bottom:4px">Solved Today</div>
+                <div class="mono" style="font-size:40px;font-weight:700;color:var(--a)" id="todayCnt">0</div>
+              </div>
+              <div style="flex:1;min-width:160px">
+                <div class="prog-bar-bg" style="height:10px">
+                  <div class="prog-fill" id="goalBar" style="width:0%;background:linear-gradient(90deg,var(--a),var(--cyan))"></div>
+                </div>
+                <div class="prog-info"><span>Goal: <strong id="goalNum">3</strong>/day</span><span id="goalPct">0%</span></div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-ghost btn-xs" onclick="chGoal(-1)">−</button>
+                <button class="btn btn-ghost btn-xs" onclick="chGoal(1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-title">🗂️ Topics Covered</div>
+          <div id="topicGrid2" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📅 Submission Heatmap</div>
+          <div class="heatmap-grid" id="heatmap2"></div>
+        </div>
+      </div>
+
+      <!-- ── LEADERBOARD ── -->
+      <div class="view" id="view-leaderboard">
+        <div class="page-hdr">🏆 Leaderboard</div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-title">⚔️ Friendly Rivalry</div>
+          <p style="font-size:13px;color:var(--dim);margin-bottom:18px">Scoring: Easy = 1pt &nbsp;|&nbsp; Medium = 2pts &nbsp;|&nbsp; Hard = 4pts</p>
+          <div id="lbContent"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📈 Comparison</div>
+          <div id="lbChart"></div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE ── -->
+      <div class="view" id="view-profile">
+        <div class="page-hdr">👤 Profile</div>
+        <div class="profile-hero" id="profHero"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px" class="resp-grid">
+          <div class="card rank-card">
+            <div class="card-title">🎖️ Current Rank</div>
+            <div id="rankDisplay"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📈 Topic Mastery</div>
+            <div id="topicMastery"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🏅 Achievements</div>
+          <div class="achiev-grid" id="achievGrid"></div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="view" id="view-settings">
+        <div class="page-hdr">⚙️ Settings</div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-title">🔒 Change Password</div>
+          <form id="pwdForm" style="max-width:380px">
+            <div class="field"><label>Current Password</label><input type="password" id="sPwOld" placeholder="Your current password" required></div>
+            <div class="field"><label>New Password</label><input type="password" id="sPwNew" placeholder="Min 6 characters" required></div>
+            <div class="field"><label>Confirm New Password</label><input type="password" id="sPwConf" placeholder="Repeat new password" required></div>
+            <button type="submit" class="btn btn-primary" style="width:auto">Update Password</button>
+            <p class="err-msg" id="pwdErr"></p>
+            <p class="ok-msg" id="pwdOk"></p>
+          </form>
+        </div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-title">🎛️ Preferences</div>
+          <div class="setting-row"><div><h4>Confirm Before Delete</h4><p>Ask confirmation when deleting problems</p></div><label class="toggle"><input type="checkbox" id="togDel" checked onchange="savePref('del',this.checked)"><span class="tog-sl"></span></label></div>
+          <div class="setting-row"><div><h4>Chat Sound Notifications</h4><p>Play a sound for new messages</p></div><label class="toggle"><input type="checkbox" id="togSound" checked onchange="savePref('sound',this.checked)"><span class="tog-sl"></span></label></div>
+          <div class="setting-row"><div><h4>Show Solutions by Default</h4><p>Expand problem cards with solutions visible</p></div><label class="toggle"><input type="checkbox" id="togSol" onchange="savePref('sol',this.checked)"><span class="tog-sl"></span></label></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🗑️ Danger Zone</div>
+          <button class="btn btn-danger btn-sm" onclick="clearAllProbs()">Delete All My Problems</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ═══════════════════ CONFIG ═══════════════════ */
+const USERS = {
+  'sit24cs034': { defaultPw:'Arav@2007',  name:'Arav',   short:'A', av:'av-arav',   phone:'3456', color:'var(--arav-c)' },
+  'brison007':  { defaultPw:'brison',     name:'Brison', short:'B', av:'av-brison', phone:'7890', color:'var(--brison-c)' }
+};
+
+let CU = null;         // current user id
+let curFilter = 'all';
+let dailyGoal = 3;
+let selTopic = '';
+let otpCode = '', otpUser = '', otpTimer = null;
+
+/* ═══════════════════ INIT ═══════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  checkAuth();
+});
+
+/* ═══════════════════ AUTH ═══════════════════ */
+function getPass(uid) { return localStorage.getItem('dsa_pw_'+uid) || USERS[uid].defaultPw; }
+
+document.getElementById('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const uid = document.getElementById('loginId').value.trim();
+  const pw  = document.getElementById('loginPw').value;
+  if (USERS[uid] && pw === getPass(uid)) {
+    localStorage.setItem('dsa_auth', uid);
+    CU = uid; initApp();
+  } else {
+    showErr('loginErr', '❌ Invalid credentials. Try again.');
+  }
+});
+
+function switchUser(who, btn) {
+  document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('loginId').value = who === 'arav' ? 'sit24cs034' : 'brison007';
+  document.getElementById('loginPw').value = '';
+}
+
+function checkAuth() {
+  const uid = localStorage.getItem('dsa_auth');
+  if (uid && USERS[uid]) { CU = uid; initApp(); }
+}
+
+function logout() { localStorage.removeItem('dsa_auth'); location.reload(); }
+
+/* ═══════════════════ FORGOT PASSWORD / OTP ═══════════════════ */
+function showForgot() {
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('forgotSection').style.display = 'block';
+}
+
+function backToLogin() {
+  document.getElementById('loginSection').style.display = 'block';
+  document.getElementById('forgotSection').style.display = 'none';
+  resetForgotSteps();
+}
+
+function resetForgotSteps() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('fstep1').classList.add('active');
+  document.querySelectorAll('.otp-box').forEach(b => b.value = '');
+  document.getElementById('forgotPhone').value = '';
+  if (otpTimer) clearInterval(otpTimer);
+}
+
+function sendOTP() {
+  const uid   = document.getElementById('forgotUser').value;
+  const phone = document.getElementById('forgotPhone').value.trim();
+  const lastFour = phone.slice(-4);
+  if (!phone || phone.length < 10) { showErr('f1Err','❌ Enter a valid 10-digit phone number.'); return; }
+  if (lastFour !== USERS[uid].phone) { showErr('f1Err','❌ Phone number does not match our records.'); return; }
+
+  // Generate simulated OTP (shown via toast for demo purposes)
+  otpCode = String(Math.floor(100000 + Math.random() * 900000));
+  otpUser = uid;
+  showOk('f1Ok','✅ OTP sent! (Demo: check the notification)');
+  toast('📱 Your OTP: ' + otpCode + ' (Valid 2 min)', 't-info');
+
+  // Switch step
+  setTimeout(() => {
+    document.getElementById('fstep1').classList.remove('active');
+    document.getElementById('fstep2').classList.add('active');
+    startOtpTimer();
+  }, 1200);
+}
+
+function startOtpTimer() {
+  let t = 120;
+  const el = document.getElementById('otpTimerTxt');
+  if (otpTimer) clearInterval(otpTimer);
+  otpTimer = setInterval(() => {
+    t--;
+    el.textContent = 'OTP expires in ' + t + 's';
+    if (t <= 0) { clearInterval(otpTimer); el.textContent = 'OTP expired. Go back and retry.'; otpCode = ''; }
+  }, 1000);
+}
+
+function otpMove(el, idx) {
+  el.value = el.value.replace(/\D/,'');
+  const boxes = document.querySelectorAll('.otp-box');
+  if (el.value && idx < 5) boxes[idx+1].focus();
+}
+
+function verifyOTP() {
+  const boxes = document.querySelectorAll('.otp-box');
+  const entered = [...boxes].map(b => b.value).join('');
+  if (entered.length < 6) { showErr('f2Err','❌ Enter all 6 digits.'); return; }
+  if (entered !== otpCode) { showErr('f2Err','❌ Wrong OTP. Try again.'); return; }
+  clearInterval(otpTimer);
+  document.getElementById('fstep2').classList.remove('active');
+  document.getElementById('fstep3').classList.add('active');
+}
+
+function resetPassword() {
+  const p1 = document.getElementById('newPw1').value;
+  const p2 = document.getElementById('newPw2').value;
+  if (p1.length < 6)  { showErr('f3Err','❌ Minimum 6 characters.'); return; }
+  if (p1 !== p2)      { showErr('f3Err','❌ Passwords do not match.'); return; }
+  localStorage.setItem('dsa_pw_'+otpUser, p1);
+  toast('✅ Password reset successfully! Please log in.', 't-ok');
+  backToLogin();
+}
+
+/* ═══════════════════ APP INIT ═══════════════════ */
+function initApp() {
+  document.getElementById('pg-login').style.display = 'none';
+  document.getElementById('pg-app').style.display = 'block';
+  dailyGoal = parseInt(localStorage.getItem('dsa_goal_'+CU) || '3');
+  document.getElementById('goalNum').textContent = dailyGoal;
+  renderSbUser();
+  loadProbs();
+  renderHeatmap('heatmap');
+  renderChat();
+  renderDoubtHist();
+}
+
+function renderSbUser() {
+  const u = USERS[CU];
+  document.getElementById('sbUser').innerHTML = `
+    <div class="av ${u.av}">${u.short}</div>
+    <div class="sb-user-info">
+      <div class="name">${u.name}</div>
+      <div class="role">${CU} — click for profile</div>
+    </div>`;
+}
+
+/* ═══════════════════ NAVIGATION ═══════════════════ */
+function showV(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  const ni = document.getElementById('ni-'+name);
+  if (ni) ni.classList.add('active');
+  if (name==='dashboard')   { loadProbs(); renderHeatmap('heatmap'); }
+  if (name==='problems')    loadProbs();
+  if (name==='chat')        { document.getElementById('nbChat').style.display='none'; renderChat(); scrollChat(); }
+  if (name==='progress')    renderProgress();
+  if (name==='leaderboard') renderLB();
+  if (name==='profile')     renderProfile();
+  if (name==='doubt')       renderDoubtHist();
+  if (window.innerWidth<=800) document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ═══════════════════ PROBLEMS ═══════════════════ */
+function getProbs() { return JSON.parse(localStorage.getItem('dsa_p_'+CU)||'[]'); }
+function saveProbs(a) { localStorage.setItem('dsa_p_'+CU, JSON.stringify(a)); }
+
+document.getElementById('addForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const tags = document.getElementById('pTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const p = {
+    id: Date.now(),
+    title: document.getElementById('pTitle').value.trim(),
+    diff:  document.getElementById('pDiff').value,
+    topic: document.getElementById('pTopic').value || 'Other',
+    status:document.getElementById('pStatus').value,
+    tags,
+    link:  document.getElementById('pLink').value.trim(),
+    q:     document.getElementById('pQ').value.trim(),
+    sol:   document.getElementById('pSol').value.trim(),
+    notes: document.getElementById('pNotes').value.trim(),
+    date:  new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}),
+    ts:    Date.now()
+  };
+  const all = getProbs(); all.unshift(p); saveProbs(all);
+  loadProbs();
+  document.getElementById('addForm').reset();
+  toast('Problem added! 🎉','t-ok');
+  showV('problems');
+});
+
+function loadProbs() {
+  const all = getProbs();
+  document.getElementById('sc-easy').textContent   = all.filter(p=>p.diff==='easy').length;
+  document.getElementById('sc-med').textContent    = all.filter(p=>p.diff==='medium').length;
+  document.getElementById('sc-hard').textContent   = all.filter(p=>p.diff==='hard').length;
+  document.getElementById('sc-total').textContent  = all.length;
+  document.getElementById('sc-streak').textContent = calcStreak(all);
+  document.getElementById('nbProb').textContent    = all.length;
+  const today = new Date().toDateString();
+  const tc = all.filter(p=>new Date(p.ts).toDateString()===today).length;
+  const el = document.getElementById('todayCnt');
+  if (el) el.textContent = tc;
+  const gb = document.getElementById('goalBar');
+  const gp = document.getElementById('goalPct');
+  if (gb) { const pct=Math.min(100,Math.round(tc/dailyGoal*100)); gb.style.width=pct+'%'; if(gp) gp.textContent=pct+'%'; }
+  renderProbs(all);
+  renderRecent(all);
+}
+
+function calcStreak(all) {
+  if (!all.length) return 0;
+  const days = [...new Set(all.map(p=>new Date(p.ts).toDateString()))].map(d=>new Date(d)).sort((a,b)=>b-a);
+  let s=0, cur=new Date(); cur.setHours(0,0,0,0);
+  for (let d of days) {
+    d.setHours(0,0,0,0);
+    const diff = Math.round((cur-d)/86400000);
+    if (diff===0||diff===1) { s++; cur=d; } else break;
+  }
+  return s;
+}
+
+function renderProbs(all) {
+  const c = document.getElementById('probList'); if (!c) return;
+  const q = (document.getElementById('srch')?.value||'').toLowerCase();
+  let f = all;
+  if (curFilter!=='all') { if(curFilter==='review') f=f.filter(p=>p.status==='review'); else f=f.filter(p=>p.diff===curFilter); }
+  if (q) f = f.filter(p=>p.title.toLowerCase().includes(q)||(p.topic||'').toLowerCase().includes(q)||(p.tags||[]).join(' ').toLowerCase().includes(q)||p.q.toLowerCase().includes(q));
+  if (!f.length) { c.innerHTML='<div class="empty"><div class="ei">🔍</div><p>No problems found.</p></div>'; return; }
+  c.innerHTML = f.map((p,i)=>`
+    <div class="prob-card d-${p.diff}" id="pc${p.id}">
+      <div class="prob-head" onclick="togPC(${p.id})">
+        <div style="flex:1;min-width:0">
+          <div class="prob-num">#${f.length-i} · ${E(p.topic||'Other')}</div>
+          <div class="prob-name">${E(p.title)}</div>
+        </div>
+        <div class="prob-meta">
+          ${p.status==='review'?'<span class="badge badge-cyan">⭐ Review</span>':'<span class="badge badge-easy">✅ Done</span>'}
+          <span class="badge badge-${p.diff}">${p.diff.toUpperCase()}</span>
+          <span class="prob-date">${p.date}</span>
+          <span class="expand-chevron">▼</span>
+        </div>
+      </div>
+      <div class="prob-body">
+        ${(p.tags||[]).length?'<div class="prob-tags">'+p.tags.map(t=>`<span class="tag-pill">#${E(t)}</span>`).join('')+'</div>':''}
+        <div class="code-lbl">Problem Statement</div>
+        <div class="code-block">${E(p.q)}</div>
+        <div class="code-lbl">Solution</div>
+        <div class="code-block">${E(p.sol)}</div>
+        ${p.notes?`<div class="code-lbl">Notes</div><div class="code-block">${E(p.notes)}</div>`:''}
+        <div class="prob-actions">
+          ${p.link?`<a href="${E(p.link)}" target="_blank" class="btn btn-ghost btn-xs">🔗 LeetCode</a>`:''}
+          <button class="btn btn-ghost btn-xs" onclick="togRev(${p.id})">${p.status==='review'?'✅ Mark Solved':'⭐ Mark Review'}</button>
+          <button class="btn btn-ghost btn-xs" onclick="shareToChat(${p.id})">💬 Discuss in Chat</button>
+          <button class="btn btn-danger btn-xs" onclick="delProb(${p.id})">🗑️ Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function togPC(id) { document.getElementById('pc'+id).classList.toggle('open'); }
+
+function togRev(id) {
+  const all=getProbs(), p=all.find(x=>x.id===id); if(!p) return;
+  p.status = p.status==='review' ? 'solved' : 'review';
+  saveProbs(all); loadProbs();
+  toast(p.status==='review'?'Marked for review ⭐':'Marked as solved ✅','t-ok');
+}
+
+function delProb(id) {
+  const conf = localStorage.getItem('dsa_pref_del_'+CU) !== 'false';
+  if (conf && !confirm('Delete this problem?')) return;
+  saveProbs(getProbs().filter(p=>p.id!==id));
+  loadProbs(); toast('Problem deleted','t-err');
+}
+
+function setF(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('.ftab').forEach(b => b.className = 'ftab');
+  if (btn) btn.classList.add('ft-'+f);
+  renderProbs(getProbs());
+}
+
+function filterProbs() { renderProbs(getProbs()); }
+
+function renderRecent(all) {
+  const el = document.getElementById('recentList'); if (!el) return;
+  const r = all.slice(0,5);
+  if (!r.length) { el.innerHTML='<div class="empty"><div class="ei">📭</div><p>Add your first problem!</p></div>'; return; }
+  el.innerHTML = r.map(p=>`
+    <div class="prob-card d-${p.diff}" style="cursor:pointer" onclick="showV('problems')">
+      <div class="prob-head">
+        <div style="flex:1;min-width:0"><div class="prob-num">${E(p.topic||'Other')}</div><div class="prob-name">${E(p.title)}</div></div>
+        <div class="prob-meta"><span class="badge badge-${p.diff}">${p.diff.toUpperCase()}</span><span class="prob-date">${p.date}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ═══════════════════ HEATMAP ═══════════════════ */
+function renderHeatmap(elId) {
+  const el = document.getElementById(elId); if (!el) return;
+  const all = getProbs(), counts = {};
+  all.forEach(p => { const d=new Date(p.ts).toDateString(); counts[d]=(counts[d]||0)+1; });
+  let h='';
+  for (let i=59;i>=0;i--) {
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const k=d.toDateString(), c=counts[k]||0;
+    const cls=c===0?'':c===1?'h1':c===2?'h2':c===3?'h3':'h4';
+    h+=`<div class="hc ${cls}" title="${k}: ${c} problems"></div>`;
+  }
+  el.innerHTML=h;
+}
+
+/* ═══════════════════ PROGRESS ═══════════════════ */
+function renderProgress() {
+  const all=getProbs(), tot=all.length||1;
+  const e=all.filter(p=>p.diff==='easy').length;
+  const m=all.filter(p=>p.diff==='medium').length;
+  const h=all.filter(p=>p.diff==='hard').length;
+
+  document.getElementById('diffBars').innerHTML=`
+    <div class="prog-row"><div class="prog-info"><span>Easy — ${e}</span><span>${Math.round(e/tot*100)}%</span></div><div class="prog-bar-bg" style="height:8px"><div class="prog-fill" style="width:${Math.round(e/tot*100)}%;background:var(--easy)"></div></div></div>
+    <div class="prog-row"><div class="prog-info"><span>Medium — ${m}</span><span>${Math.round(m/tot*100)}%</span></div><div class="prog-bar-bg" style="height:8px"><div class="prog-fill" style="width:${Math.round(m/tot*100)}%;background:var(--medium)"></div></div></div>
+    <div class="prog-row"><div class="prog-info"><span>Hard — ${h}</span><span>${Math.round(h/tot*100)}%</span></div><div class="prog-bar-bg" style="height:8px"><div class="prog-fill" style="width:${Math.round(h/tot*100)}%;background:var(--hard)"></div></div></div>`;
+
+  const tm={};
+  all.forEach(p=>{ const t=p.topic||'Other'; tm[t]=(tm[t]||0)+1; });
+  document.getElementById('topicGrid2').innerHTML = Object.entries(tm).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:10px 14px;text-align:center;min-width:90px">
+      <div class="mono" style="font-size:22px;font-weight:700;color:var(--a)">${n}</div>
+      <div style="font-size:11px;color:var(--dim);margin-top:2px">${t}</div>
+    </div>`).join('');
+
+  document.getElementById('goalNum').textContent = dailyGoal;
+  const today=new Date().toDateString();
+  const tc=all.filter(p=>new Date(p.ts).toDateString()===today).length;
+  document.getElementById('todayCnt').textContent=tc;
+  const pct=Math.min(100,Math.round(tc/dailyGoal*100));
+  document.getElementById('goalBar').style.width=pct+'%';
+  document.getElementById('goalPct').textContent=pct+'%';
+
+  renderHeatmap('heatmap2');
+}
+
+function chGoal(d) {
+  dailyGoal=Math.max(1,dailyGoal+d);
+  localStorage.setItem('dsa_goal_'+CU, dailyGoal);
+  renderProgress();
+}
+
+/* ═══════════════════ LEADERBOARD ═══════════════════ */
+function renderLB() {
+  const myP = getProbs();
+  const other = CU==='sit24cs034' ? 'brison007' : 'sit24cs034';
+  const otherP = JSON.parse(localStorage.getItem('dsa_p_'+other)||'[]');
+  const sc = a => a.filter(p=>p.diff==='easy').length*1 + a.filter(p=>p.diff==='medium').length*2 + a.filter(p=>p.diff==='hard').length*4;
+  const rows = [{uid:CU,p:myP,s:sc(myP)},{uid:other,p:otherP,s:sc(otherP)}].sort((a,b)=>b.s-a.s);
+  const medals=['rank-gold','rank-silver'], icons=['🥇','🥈'];
+  document.getElementById('lbContent').innerHTML = rows.map((r,i)=>{
+    const u=USERS[r.uid], isMe=r.uid===CU;
+    const e=r.p.filter(x=>x.diff==='easy').length,m=r.p.filter(x=>x.diff==='medium').length,h=r.p.filter(x=>x.diff==='hard').length;
+    return `<div class="lb-row ${isMe?'lb-me':''}">
+      <div class="lb-rank-num ${medals[i]}">${icons[i]}</div>
+      <div class="av ${u.av}" style="width:36px;height:36px;font-size:14px">${u.short}</div>
+      <div><div class="lb-name">${u.name}${isMe?' <span style="font-size:10px;color:var(--a)">(you)</span>':''}</div><div class="lb-stats">E:${e} M:${m} H:${h} · ${r.p.length} total</div></div>
+      <div class="lb-score">${r.s}pts</div>
+    </div>`;
+  }).join('');
+
+  // simple comparison bars
+  const total = rows[0].s + rows[1].s || 1;
+  document.getElementById('lbChart').innerHTML = rows.map(r=>{
+    const u=USERS[r.uid], pct=Math.round(r.s/total*100);
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:5px"><span>${u.name}</span><span class="mono">${r.s}pts (${pct}%)</span></div>
+      <div class="prog-bar-bg" style="height:10px"><div class="prog-fill" style="width:${pct}%;background:${u.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════ PROFILE ═══════════════════ */
+function renderProfile() {
+  const u = USERS[CU];
+  const all = getProbs();
+  const e=all.filter(p=>p.diff==='easy').length,m=all.filter(p=>p.diff==='medium').length,h=all.filter(p=>p.diff==='hard').length;
+  const sc = e*1+m*2+h*4;
+  const streak = calcStreak(all);
+
+  document.getElementById('profHero').innerHTML=`
+    <div class="profile-av-lg ${u.av}">${u.short}</div>
+    <div class="profile-info">
+      <h2>${u.name}</h2>
+      <p style="color:var(--dim)">${CU}</p>
+      <p class="p-since" style="color:var(--dim)">🗓️ Member since ${new Date().toLocaleDateString('en-IN',{month:'long',year:'numeric'})}</p>
+    </div>
+    <div class="profile-stats">
+      <div class="pstat"><div class="pstat-n" style="color:var(--a)">${all.length}</div><div class="pstat-l">Solved</div></div>
+      <div class="pstat"><div class="pstat-n" style="color:var(--yellow)">${streak}</div><div class="pstat-l">Streak</div></div>
+      <div class="pstat"><div class="pstat-n" style="color:var(--cyan)">${sc}</div><div class="pstat-l">Score</div></div>
+    </div>`;
+
+  // Rank
+  const rank = sc>=100?'💎 Diamond':sc>=60?'🥇 Gold':sc>=30?'🥈 Silver':sc>=10?'🥉 Bronze':'🌱 Beginner';
+  const nextRank = sc<10?'Bronze (10pts)':sc<30?'Silver (30pts)':sc<60?'Gold (60pts)':sc<100?'Diamond (100pts)':'Max Rank!';
+  document.getElementById('rankDisplay').innerHTML=`
+    <div class="rank-badge">${rank}</div>
+    <p style="font-size:12px;color:var(--dim);margin-top:10px">Next: ${nextRank}</p>
+    <div class="prog-bar-bg" style="height:6px;margin-top:8px">
+      <div class="prog-fill" style="width:${Math.min(100,sc)}%;background:linear-gradient(90deg,var(--a),var(--cyan))"></div>
+    </div>`;
+
+  // Topic mastery
+  const tm={};
+  all.forEach(p=>{ const t=p.topic||'Other'; tm[t]=(tm[t]||0)+1; });
+  const top = Object.entries(tm).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const maxT = top[0]?.[1]||1;
+  document.getElementById('topicMastery').innerHTML = top.length ? top.map(([t,n])=>`
+    <div class="prog-row">
+      <div class="prog-info"><span>${t}</span><span class="mono">${n}</span></div>
+      <div class="prog-bar-bg" style="height:6px"><div class="prog-fill" style="width:${Math.round(n/maxT*100)}%;background:var(--a)"></div></div>
+    </div>`).join('') : '<p style="color:var(--dim);font-size:13px">No data yet.</p>';
+
+  // Achievements
+  const achievs = [
+    { icon:'🌱', name:'First Step',     desc:'Add your 1st problem',   earned: all.length>=1 },
+    { icon:'🎯', name:'On a Roll',      desc:'Solve 5 problems',        earned: all.length>=5 },
+    { icon:'🔥', name:'Grind Mode',     desc:'Solve 20 problems',       earned: all.length>=20 },
+    { icon:'⚡', name:'Speed Runner',   desc:'3 problems in one day',   earned: (() => { const t=new Date().toDateString(); return all.filter(p=>new Date(p.ts).toDateString()===t).length>=3; })() },
+    { icon:'💎', name:'Diamond Coder',  desc:'Earn 100+ points',        earned: sc>=100 },
+    { icon:'🏆', name:'Hard Crusher',   desc:'Solve 5 hard problems',   earned: h>=5 },
+    { icon:'🧠', name:'Topic Master',   desc:'Cover 5 different topics', earned: Object.keys(tm).length>=5 },
+    { icon:'🤝', name:'Team Player',    desc:'Share a problem in chat',  earned: !!localStorage.getItem('dsa_shared_'+CU) },
+    { icon:'📅', name:'Consistent',     desc:'7-day streak',             earned: streak>=7 },
+    { icon:'🌟', name:'Legend',         desc:'Solve 50 problems',        earned: all.length>=50 },
+  ];
+  document.getElementById('achievGrid').innerHTML = achievs.map(a=>`
+    <div class="achiev-card ${a.earned?'earned':''}">
+      <div class="ac-icon">${a.icon}</div>
+      <div class="ac-name">${a.name}</div>
+      <div class="ac-desc">${a.desc}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════ CHAT ═══════════════════ */
+function getChat() { return JSON.parse(localStorage.getItem('dsa_chat')||'[]'); }
+function saveChat(a) { localStorage.setItem('dsa_chat',JSON.stringify(a)); }
+
+function renderChat() {
+  const msgs = getChat();
+  const el = document.getElementById('chatBody'); if (!el) return;
+  if (!msgs.length) {
+    el.innerHTML='<div class="empty"><div class="ei">💬</div><p>Start a discussion!</p></div>';
+    return;
+  }
+  el.innerHTML = msgs.map(m=>{
+    const isMine=m.uid===CU, isAI=m.uid==='ai';
+    const u=USERS[m.uid]||{short:'🤖',av:''};
+    const cls=isAI?'ai-msg':isMine?'mine':'theirs';
+    const avStyle = isAI ? 'background:rgba(0,229,204,.15);color:var(--cyan)' : '';
+    const avCls = isAI?'':u.av;
+    return `<div class="msg ${cls}">
+      <div class="mav ${avCls}" style="${avStyle}">${isAI?'🤖':u.short}</div>
+      <div class="msg-wrap">
+        ${isAI?'<div class="ai-tag">🤖 AI Assistant</div>':`<div class="msg-sender">${E(USERS[m.uid]?.name||m.uid)}</div>`}
+        <div class="bubble ${m.isCode?'code-bubble':''}">${E(m.text)}</div>
+        <div class="msg-time">${m.time}</div>
+      </div>
+    </div>`;
+  }).join('');
+  scrollChat();
+}
+
+function scrollChat() { const el=document.getElementById('chatBody'); if(el) setTimeout(()=>el.scrollTop=el.scrollHeight,60); }
+
+function sendChat() {
+  const inp=document.getElementById('chatInput'), t=inp.value.trim(); if(!t) return;
+  const msgs=getChat();
+  msgs.push({ uid:CU, text:t, isCode:t.startsWith('```'), time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}), id:Date.now() });
+  saveChat(msgs); inp.value=''; renderChat();
+}
+
+function chatKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+
+function injectSnip(t) {
+  const el=document.getElementById('chatInput');
+  const s={code:'```\n// paste code here\n```',doubt:'❓ Doubt: ',share:'📌 Problem: '};
+  el.value=s[t]||''; el.focus();
+}
+
+async function chatAI() {
+  const inp=document.getElementById('chatInput'), q=inp.value.trim();
+  if(!q){toast('Type a DSA question first','t-err');return;}
+  inp.value='';
+  const msgs=getChat();
+  msgs.push({uid:CU,text:q,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),id:Date.now()});
+  saveChat(msgs); renderChat();
+  document.getElementById('typingRow').style.display='block'; scrollChat();
+  // Simulate typing delay then answer from local knowledge base
+  await new Promise(r=>setTimeout(r,900+Math.random()*600));
+  const reply = dsaAnswer(q);
+  document.getElementById('typingRow').style.display='none';
+  const m2=getChat();
+  m2.push({uid:'ai',text:reply,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),id:Date.now()});
+  saveChat(m2); renderChat();
+}
+
+function clearChat() {
+  if(!confirm('Clear all chat messages?')) return;
+  saveChat([]); renderChat(); toast('Chat cleared','t-err');
+}
+
+function shareToChat(id) {
+  const p=getProbs().find(x=>x.id===id); if(!p) return;
+  const msgs=getChat();
+  msgs.push({uid:CU,text:`📌 Problem: ${p.title} [${p.diff.toUpperCase()}]\nTopic: ${p.topic||'–'}\n\n${p.q.slice(0,300)}${p.q.length>300?'…':''}`,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),id:Date.now()});
+  saveChat(msgs);
+  localStorage.setItem('dsa_shared_'+CU,'1');
+  toast('Shared to chat! 💬','t-ok');
+  showV('chat');
+}
+
+// Poll chat every 5s for simulated real-time
+setInterval(()=>{ const v=document.querySelector('.view.active'); if(v&&v.id==='view-chat') renderChat(); },5000);
+
+/* ═══════════════════ AI DOUBT SOLVER ═══════════════════ */
+function pickTopic(el,t) {
+  document.querySelectorAll('.topic-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); selTopic=t;
+  const inp=document.getElementById('doubtQ');
+  if(!inp.value) inp.value=`Explain ${t} concept with examples, common patterns, and time complexity.`;
+}
+
+async function askDoubt() {
+  const q=document.getElementById('doubtQ').value.trim();
+  if(!q){toast('Please enter a question','t-err');return;}
+  const ab=document.getElementById('ansBlock'),body=document.getElementById('ansBody'),ld=document.getElementById('ansLoad');
+  ab.style.display='block'; body.innerHTML=''; ld.style.display='inline-flex';
+  // Simulate thinking delay
+  await new Promise(r=>setTimeout(r,700+Math.random()*800));
+  ld.style.display='none';
+  const fullQ = (selTopic ? selTopic+' '+q : q);
+  const ans = dsaAnswer(fullQ);
+  body.innerHTML = formatAns(ans);
+  const hist=JSON.parse(localStorage.getItem('dsa_dh_'+CU)||'[]');
+  hist.unshift({q,a:ans,topic:selTopic,time:new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})});
+  localStorage.setItem('dsa_dh_'+CU,JSON.stringify(hist.slice(0,30)));
+  renderDoubtHist();
+}
+
+function formatAns(text) {
+  return E(text)
+    .replace(/```[\w]*\n?([\s\S]*?)```/g,(_,c)=>`</div><pre style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);padding:14px;font-family:'Fira Code',monospace;font-size:12px;overflow-x:auto;margin:10px 0;color:#c8cde0;line-height:1.7;white-space:pre-wrap">${c.trim()}</pre><div class="ans-body">`)
+    .replace(/`([^`]+)`/g,'<code>$1</code>');
+}
+
+function renderDoubtHist() {
+  if(!CU) return;
+  const hist=JSON.parse(localStorage.getItem('dsa_dh_'+CU)||'[]');
+  const el=document.getElementById('doubtHist'); if(!el) return;
+  if(!hist.length){el.innerHTML='<div class="empty"><div class="ei">💭</div><p>No doubts yet.</p></div>';return;}
+  el.innerHTML=hist.map(h=>`
+    <div class="dh-item" onclick="this.querySelector('.dh-preview').style.display=this.querySelector('.dh-preview').style.display==='none'?'block':'none'">
+      <div style="display:flex;align-items:center;gap:7px;justify-content:space-between;flex-wrap:wrap">
+        <div>${h.topic?`<span class="badge badge-a" style="margin-right:6px">${E(h.topic)}</span>`:''}<span class="dh-q">${E(h.q.slice(0,70))}${h.q.length>70?'…':''}</span></div>
+        <span style="font-size:10px;color:var(--muted);font-family:'Fira Code',monospace;flex-shrink:0">${h.time}</span>
+      </div>
+      <div class="dh-preview">${E(h.a.slice(0,350))}${h.a.length>350?'…':''}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════ SETTINGS ═══════════════════ */
+document.getElementById('pwdForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const old=document.getElementById('sPwOld').value;
+  const nw=document.getElementById('sPwNew').value;
+  const cf=document.getElementById('sPwConf').value;
+  const errEl=document.getElementById('pwdErr'), okEl=document.getElementById('pwdOk');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(old!==getPass(CU)){showErr('pwdErr','❌ Current password is incorrect.');return;}
+  if(nw.length<6){showErr('pwdErr','❌ Minimum 6 characters.');return;}
+  if(nw!==cf){showErr('pwdErr','❌ Passwords do not match.');return;}
+  localStorage.setItem('dsa_pw_'+CU,nw);
+  showOk('pwdOk','✅ Password updated!');
+  document.getElementById('pwdForm').reset();
+  toast('Password changed 🔒','t-ok');
+});
+
+function savePref(k,v) { localStorage.setItem('dsa_pref_'+k+'_'+CU,v); }
+
+function clearAllProbs() {
+  if(!confirm('⚠️ Delete ALL your problems? This is irreversible.')) return;
+  localStorage.removeItem('dsa_p_'+CU);
+  loadProbs(); toast('All problems cleared','t-err');
+}
+
+/* ═══════════════════ UTILS ═══════════════════ */
+function E(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+let toastT;
+function toast(msg, type='t-ok') {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='show '+type;
+  clearTimeout(toastT); toastT=setTimeout(()=>el.className='',3500);
+}
+
+function showErr(id, msg) {
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.textContent=msg; el.style.display='block';
+  setTimeout(()=>el.style.display='none',4000);
+}
+
+function showOk(id, msg) {
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.textContent=msg; el.style.display='block';
+  setTimeout(()=>el.style.display='none',4000);
+}
+
+/* responsive grid fix */
+const styleEl=document.createElement('style');
+styleEl.textContent='@media(max-width:700px){.resp-grid{grid-template-columns:1fr !important}}';
+document.head.appendChild(styleEl);
+
+/* ═══════════════════════════════════════════════════════════
+   DSA KNOWLEDGE BASE  — works 100% offline, no API needed
+═══════════════════════════════════════════════════════════ */
+const DSA_KB = [
+  // ── ARRAYS ──
+  { keys:['two sum','twosum','pair sum','find pair'],
+    ans:`## Two Sum Problem
+
+**Problem:** Find two indices such that nums[i] + nums[j] = target.
+
+**Approach 1 — HashMap (O(n) time, O(n) space):**
+\`\`\`python
+def twoSum(nums, target):
+    seen = {}          # value → index
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    return []
+\`\`\`
+**Why it works:** For each number we check if its complement already exists in the map. One pass — O(n).
+
+**Approach 2 — Two Pointers on sorted array (O(n log n)):**
+\`\`\`python
+def twoSum(nums, target):
+    nums = sorted(enumerate(nums), key=lambda x: x[1])
+    l, r = 0, len(nums)-1
+    while l < r:
+        s = nums[l][1] + nums[r][1]
+        if s == target:   return [nums[l][0], nums[r][0]]
+        elif s < target:  l += 1
+        else:             r -= 1
+\`\`\`
+**Time:** O(n) | **Space:** O(n) for HashMap approach.` },
+
+  { keys:['kadane','maximum subarray','max subarray','largest sum contiguous'],
+    ans:`## Kadane's Algorithm — Maximum Subarray Sum
+
+**Idea:** At each index, decide: extend current subarray OR start fresh from here.
+
+\`\`\`python
+def maxSubArray(nums):
+    max_sum = nums[0]
+    curr    = nums[0]
+
+    for num in nums[1:]:
+        curr    = max(num, curr + num)   # extend or restart
+        max_sum = max(max_sum, curr)
+
+    return max_sum
+
+# Example: [-2,1,-3,4,-1,2,1,-5,4]
+# Answer:  6  (subarray [4,-1,2,1])
+\`\`\`
+
+**Key insight:** If \`curr\` becomes negative, it only hurts future sums — reset to \`num\`.
+
+| Complexity | Value |
+|---|---|
+| Time  | O(n) |
+| Space | O(1) |
+
+**Variants:**
+- Return the actual subarray → track start/end indices
+- Circular subarray → max of (normal Kadane, total_sum - min_subarray)` },
+
+  { keys:['sliding window','window','substring','subarray sum k','longest subarray'],
+    ans:`## Sliding Window Technique
+
+Used when the problem involves a **contiguous subarray/substring** of fixed or variable size.
+
+### Fixed-size window (size k)
+\`\`\`python
+def maxSumK(arr, k):
+    window = sum(arr[:k])
+    best   = window
+    for i in range(k, len(arr)):
+        window += arr[i] - arr[i-k]   # slide: add right, remove left
+        best = max(best, window)
+    return best
+\`\`\`
+
+### Variable-size window (e.g., longest subarray with sum ≤ k)
+\`\`\`python
+def longestSubarraySum(arr, k):
+    l = total = best = 0
+    for r in range(len(arr)):
+        total += arr[r]
+        while total > k:          # shrink from left
+            total -= arr[l]; l += 1
+        best = max(best, r - l + 1)
+    return best
+\`\`\`
+
+**Time:** O(n) — each element enters and leaves the window at most once.
+**Space:** O(1) for sum-based problems.
+
+**When to use:** "longest/shortest subarray with condition", "all substrings of size k".` },
+
+  { keys:['two pointer','two pointers','dutch flag','3sum','three sum','remove duplicates'],
+    ans:`## Two Pointer Technique
+
+Two pointers move toward each other (or same direction) to avoid O(n²) brute force.
+
+### Pattern 1 — Opposite ends (sorted array)
+\`\`\`python
+def twoSumSorted(arr, target):
+    l, r = 0, len(arr)-1
+    while l < r:
+        s = arr[l] + arr[r]
+        if   s == target: return True
+        elif s < target:  l += 1
+        else:             r -= 1
+    return False
+\`\`\`
+
+### Pattern 2 — Fast & Slow (remove duplicates in-place)
+\`\`\`python
+def removeDuplicates(nums):
+    slow = 0
+    for fast in range(1, len(nums)):
+        if nums[fast] != nums[slow]:
+            slow += 1
+            nums[slow] = nums[fast]
+    return slow + 1
+\`\`\`
+
+### 3Sum (find all triplets summing to 0)
+\`\`\`python
+def threeSum(nums):
+    nums.sort(); res = []
+    for i in range(len(nums)-2):
+        if i > 0 and nums[i] == nums[i-1]: continue  # skip dup
+        l, r = i+1, len(nums)-1
+        while l < r:
+            s = nums[i]+nums[l]+nums[r]
+            if   s == 0: res.append([nums[i],nums[l],nums[r]]); l+=1; r-=1
+            elif s < 0:  l+=1
+            else:        r-=1
+    return res
+\`\`\`
+**Time:** O(n²) | **Space:** O(1) extra` },
+
+  { keys:['binary search','bisect','search rotated','find element sorted'],
+    ans:`## Binary Search
+
+Cuts search space in **half** each step. Requires sorted (or partially ordered) data.
+
+### Standard template
+\`\`\`python
+def binarySearch(arr, target):
+    lo, hi = 0, len(arr)-1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if   arr[mid] == target: return mid
+        elif arr[mid] <  target: lo = mid + 1
+        else:                    hi = mid - 1
+    return -1     # not found
+\`\`\`
+
+### Find first/last occurrence (lower/upper bound)
+\`\`\`python
+def lowerBound(arr, target):   # first index where arr[i] >= target
+    lo, hi = 0, len(arr)
+    while lo < hi:
+        mid = (lo+hi)//2
+        if arr[mid] < target: lo = mid+1
+        else:                 hi = mid
+    return lo
+\`\`\`
+
+### Search in rotated sorted array
+\`\`\`python
+def searchRotated(nums, target):
+    lo, hi = 0, len(nums)-1
+    while lo <= hi:
+        mid = (lo+hi)//2
+        if nums[mid] == target: return mid
+        if nums[lo] <= nums[mid]:        # left half sorted
+            if nums[lo] <= target < nums[mid]: hi = mid-1
+            else: lo = mid+1
+        else:                            # right half sorted
+            if nums[mid] < target <= nums[hi]: lo = mid+1
+            else: hi = mid-1
+    return -1
+\`\`\`
+**Time:** O(log n) | **Space:** O(1)` },
+
+  // ── LINKED LIST ──
+  { keys:['linked list','reverse linked','detect cycle','floyd','slow fast','merge sorted lists','middle node'],
+    ans:`## Linked List — Core Patterns
+
+### 1. Reverse a Linked List
+\`\`\`python
+def reverse(head):
+    prev = None
+    curr = head
+    while curr:
+        nxt  = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nxt
+    return prev   # new head
+\`\`\`
+
+### 2. Detect Cycle — Floyd's Algorithm
+\`\`\`python
+def hasCycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast: return True
+    return False
+\`\`\`
+
+### 3. Find Middle Node
+\`\`\`python
+def middleNode(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow   # slow is at middle
+\`\`\`
+
+### 4. Merge Two Sorted Lists
+\`\`\`python
+def mergeTwoLists(l1, l2):
+    dummy = ListNode(0)
+    cur   = dummy
+    while l1 and l2:
+        if l1.val <= l2.val: cur.next = l1; l1 = l1.next
+        else:                cur.next = l2; l2 = l2.next
+        cur = cur.next
+    cur.next = l1 or l2
+    return dummy.next
+\`\`\`
+All patterns: **Time O(n) | Space O(1)**` },
+
+  // ── TREES ──
+  { keys:['binary tree','bfs','level order','tree traversal','inorder','preorder','postorder','dfs tree','height tree','diameter'],
+    ans:`## Binary Tree — Traversals & Key Algorithms
+
+### DFS Traversals (Recursive)
+\`\`\`python
+def inorder(root):    # Left → Root → Right  (gives sorted order for BST)
+    if not root: return []
+    return inorder(root.left) + [root.val] + inorder(root.right)
+
+def preorder(root):   # Root → Left → Right  (copy tree, serialize)
+    if not root: return []
+    return [root.val] + preorder(root.left) + preorder(root.right)
+
+def postorder(root):  # Left → Right → Root  (delete tree, eval expression)
+    if not root: return []
+    return postorder(root.left) + postorder(root.right) + [root.val]
+\`\`\`
+
+### BFS — Level Order Traversal
+\`\`\`python
+from collections import deque
+def levelOrder(root):
+    if not root: return []
+    q, res = deque([root]), []
+    while q:
+        level = []
+        for _ in range(len(q)):
+            node = q.popleft()
+            level.append(node.val)
+            if node.left:  q.append(node.left)
+            if node.right: q.append(node.right)
+        res.append(level)
+    return res
+\`\`\`
+
+### Height of Tree
+\`\`\`python
+def height(root):
+    if not root: return 0
+    return 1 + max(height(root.left), height(root.right))
+\`\`\`
+
+### Diameter (longest path between any two nodes)
+\`\`\`python
+def diameterOfBinaryTree(root):
+    best = [0]
+    def dfs(node):
+        if not node: return 0
+        l, r = dfs(node.left), dfs(node.right)
+        best[0] = max(best[0], l + r)
+        return 1 + max(l, r)
+    dfs(root)
+    return best[0]
+\`\`\`
+**Time:** O(n) for all | **Space:** O(h) recursion stack (h = height)` },
+
+  { keys:['bst','binary search tree','validate bst','lca','lowest common ancestor','insert bst','search bst'],
+    ans:`## Binary Search Tree (BST)
+
+**Property:** left < root < right at every node.
+
+### Search / Insert
+\`\`\`python
+def search(root, val):
+    if not root or root.val == val: return root
+    if val < root.val: return search(root.left, val)
+    return search(root.right, val)
+
+def insert(root, val):
+    if not root: return TreeNode(val)
+    if val < root.val: root.left  = insert(root.left,  val)
+    else:              root.right = insert(root.right, val)
+    return root
+\`\`\`
+
+### Validate BST
+\`\`\`python
+def isValidBST(root, lo=float('-inf'), hi=float('inf')):
+    if not root: return True
+    if not (lo < root.val < hi): return False
+    return (isValidBST(root.left,  lo, root.val) and
+            isValidBST(root.right, root.val, hi))
+\`\`\`
+
+### Lowest Common Ancestor
+\`\`\`python
+def lowestCommonAncestor(root, p, q):
+    if root.val > p.val and root.val > q.val:
+        return lowestCommonAncestor(root.left, p, q)
+    if root.val < p.val and root.val < q.val:
+        return lowestCommonAncestor(root.right, p, q)
+    return root   # one on each side → this is LCA
+\`\`\`
+**Search/Insert Time:** O(h)  |  h = O(log n) balanced, O(n) worst` },
+
+  // ── GRAPHS ──
+  { keys:['graph','bfs graph','dfs graph','dijkstra','shortest path','topological sort','cycle detection graph','union find','disjoint set'],
+    ans:`## Graphs — Core Algorithms
+
+### BFS (shortest path in unweighted graph)
+\`\`\`python
+from collections import deque
+def bfs(graph, src):
+    visited = {src}
+    q = deque([(src, 0)])   # (node, distance)
+    while q:
+        node, dist = q.popleft()
+        print(node, dist)
+        for nb in graph[node]:
+            if nb not in visited:
+                visited.add(nb)
+                q.append((nb, dist+1))
+\`\`\`
+
+### DFS (detect cycle, path finding)
+\`\`\`python
+def dfs(graph, node, visited=set()):
+    visited.add(node)
+    for nb in graph[node]:
+        if nb not in visited:
+            dfs(graph, nb, visited)
+\`\`\`
+
+### Dijkstra (weighted shortest path)
+\`\`\`python
+import heapq
+def dijkstra(graph, src):
+    dist = {src: 0}
+    heap = [(0, src)]   # (cost, node)
+    while heap:
+        d, u = heapq.heappop(heap)
+        if d > dist.get(u, float('inf')): continue
+        for v, w in graph[u]:
+            nd = d + w
+            if nd < dist.get(v, float('inf')):
+                dist[v] = nd
+                heapq.heappush(heap, (nd, v))
+    return dist
+\`\`\`
+**Time:** O((V+E) log V)
+
+### Topological Sort (Kahn's BFS)
+\`\`\`python
+from collections import deque
+def topoSort(n, edges):
+    indeg = [0]*n
+    adj   = [[] for _ in range(n)]
+    for u,v in edges: adj[u].append(v); indeg[v]+=1
+    q = deque(i for i in range(n) if indeg[i]==0)
+    order = []
+    while q:
+        u = q.popleft(); order.append(u)
+        for v in adj[u]:
+            indeg[v] -= 1
+            if indeg[v]==0: q.append(v)
+    return order if len(order)==n else []  # empty = cycle exists
+\`\`\`` },
+
+  // ── DP ──
+  { keys:['dynamic programming','dp','memoization','tabulation','fibonacci','knapsack','longest common subsequence','lcs','longest increasing subsequence','lis','coin change','0/1 knapsack'],
+    ans:`## Dynamic Programming (DP)
+
+**Core idea:** Break problem into overlapping subproblems, cache results.
+
+### Fibonacci (Top-down vs Bottom-up)
+\`\`\`python
+# Top-down (Memoization)
+from functools import lru_cache
+@lru_cache(None)
+def fib(n):
+    if n <= 1: return n
+    return fib(n-1) + fib(n-2)
+
+# Bottom-up (Tabulation) — O(n) time, O(1) space
+def fib(n):
+    a, b = 0, 1
+    for _ in range(n): a, b = b, a+b
+    return a
+\`\`\`
+
+### 0/1 Knapsack
+\`\`\`python
+def knapsack(weights, values, W):
+    n = len(weights)
+    dp = [[0]*(W+1) for _ in range(n+1)]
+    for i in range(1, n+1):
+        for w in range(W+1):
+            dp[i][w] = dp[i-1][w]   # don't take item i
+            if weights[i-1] <= w:
+                dp[i][w] = max(dp[i][w], dp[i-1][w-weights[i-1]] + values[i-1])
+    return dp[n][W]
+\`\`\`
+**Time:** O(n·W) | **Space:** O(n·W), optimizable to O(W)
+
+### Longest Common Subsequence
+\`\`\`python
+def lcs(s, t):
+    m, n = len(s), len(t)
+    dp = [[0]*(n+1) for _ in range(m+1)]
+    for i in range(1,m+1):
+        for j in range(1,n+1):
+            if s[i-1]==t[j-1]: dp[i][j] = dp[i-1][j-1]+1
+            else:              dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+    return dp[m][n]
+\`\`\`
+
+### Coin Change (min coins)
+\`\`\`python
+def coinChange(coins, amount):
+    dp = [float('inf')] * (amount+1)
+    dp[0] = 0
+    for coin in coins:
+        for x in range(coin, amount+1):
+            dp[x] = min(dp[x], dp[x-coin]+1)
+    return dp[amount] if dp[amount] != float('inf') else -1
+\`\`\`
+**Time:** O(amount × coins) | **Space:** O(amount)` },
+
+  { keys:['longest increasing subsequence','lis'],
+    ans:`## Longest Increasing Subsequence (LIS)
+
+### O(n²) DP
+\`\`\`python
+def lis(nums):
+    n = len(nums)
+    dp = [1] * n
+    for i in range(1, n):
+        for j in range(i):
+            if nums[j] < nums[i]:
+                dp[i] = max(dp[i], dp[j]+1)
+    return max(dp)
+\`\`\`
+
+### O(n log n) — Binary Search + Patience Sorting
+\`\`\`python
+import bisect
+def lis(nums):
+    tails = []
+    for num in nums:
+        pos = bisect.bisect_left(tails, num)
+        if pos == len(tails): tails.append(num)
+        else:                 tails[pos] = num
+    return len(tails)
+\`\`\`
+\`tails\` is always sorted; we maintain the smallest possible tail for each length.
+**Time:** O(n log n) | **Space:** O(n)` },
+
+  // ── RECURSION / BACKTRACKING ──
+  { keys:['backtracking','permutation','combination','subset','n queens','sudoku','word search'],
+    ans:`## Backtracking
+
+**Template:** choose → explore → unchoose.
+
+### Generate All Subsets
+\`\`\`python
+def subsets(nums):
+    res = []
+    def bt(start, path):
+        res.append(path[:])          # add current subset
+        for i in range(start, len(nums)):
+            path.append(nums[i])
+            bt(i+1, path)
+            path.pop()               # undo choice
+    bt(0, [])
+    return res
+\`\`\`
+
+### All Permutations
+\`\`\`python
+def permute(nums):
+    res = []
+    def bt(path, used):
+        if len(path) == len(nums): res.append(path[:]); return
+        for i,n in enumerate(nums):
+            if used[i]: continue
+            used[i] = True;  path.append(n)
+            bt(path, used)
+            path.pop();      used[i] = False
+    bt([], [False]*len(nums))
+    return res
+\`\`\`
+
+### Combination Sum (pick with repetition)
+\`\`\`python
+def combinationSum(candidates, target):
+    res = []
+    def bt(start, path, rem):
+        if rem == 0: res.append(path[:]); return
+        for i in range(start, len(candidates)):
+            c = candidates[i]
+            if c > rem: break         # prune
+            path.append(c); bt(i, path, rem-c); path.pop()
+    candidates.sort()
+    bt(0, [], target)
+    return res
+\`\`\`
+**Time:** O(2^n) worst case. Pruning makes it much faster in practice.` },
+
+  // ── HASHING ──
+  { keys:['hash','hashmap','dictionary','anagram','group anagram','frequency count','duplicate'],
+    ans:`## Hashing — HashMap Patterns
+
+### Frequency Count
+\`\`\`python
+from collections import Counter
+def isAnagram(s, t):
+    return Counter(s) == Counter(t)
+\`\`\`
+
+### Group Anagrams
+\`\`\`python
+from collections import defaultdict
+def groupAnagrams(strs):
+    mp = defaultdict(list)
+    for s in strs:
+        key = tuple(sorted(s))    # canonical form
+        mp[key].append(s)
+    return list(mp.values())
+\`\`\`
+
+### Subarray with sum = k
+\`\`\`python
+def subarraySum(nums, k):
+    count = 0
+    prefix = {0: 1}
+    total  = 0
+    for n in nums:
+        total += n
+        count += prefix.get(total - k, 0)
+        prefix[total] = prefix.get(total, 0) + 1
+    return count
+\`\`\`
+**Key trick:** prefix_sum[j] - prefix_sum[i] = k → prefix_sum[i] = prefix_sum[j] - k
+
+**Time:** O(n) | **Space:** O(n)
+
+### Longest Consecutive Sequence
+\`\`\`python
+def longestConsecutive(nums):
+    s = set(nums)
+    best = 0
+    for n in s:
+        if n-1 not in s:        # start of a sequence
+            length = 1
+            while n+length in s: length += 1
+            best = max(best, length)
+    return best
+\`\`\`
+**Time:** O(n)` },
+
+  // ── STACK / QUEUE ──
+  { keys:['stack','queue','monotonic stack','next greater element','valid parentheses','min stack','daily temperatures'],
+    ans:`## Stack & Monotonic Stack
+
+### Valid Parentheses
+\`\`\`python
+def isValid(s):
+    stack = []
+    match = {')':'(', ']':'[', '}':'{'}
+    for c in s:
+        if c in '([{': stack.append(c)
+        else:
+            if not stack or stack[-1] != match[c]: return False
+            stack.pop()
+    return not stack
+\`\`\`
+
+### Next Greater Element (Monotonic Stack)
+\`\`\`python
+def nextGreaterElement(nums):
+    res   = [-1] * len(nums)
+    stack = []           # stores indices, decreasing values
+    for i, n in enumerate(nums):
+        while stack and nums[stack[-1]] < n:
+            res[stack.pop()] = n    # n is the next greater for stack top
+        stack.append(i)
+    return res
+\`\`\`
+
+### Daily Temperatures (days until warmer)
+\`\`\`python
+def dailyTemperatures(T):
+    res, stack = [0]*len(T), []
+    for i, t in enumerate(T):
+        while stack and T[stack[-1]] < t:
+            j = stack.pop()
+            res[j] = i - j
+        stack.append(i)
+    return res
+\`\`\`
+
+### Min Stack (O(1) getMin)
+\`\`\`python
+class MinStack:
+    def __init__(self): self.s = []; self.m = []
+    def push(self, v):
+        self.s.append(v)
+        self.m.append(min(v, self.m[-1] if self.m else v))
+    def pop(self):  self.s.pop(); self.m.pop()
+    def top(self):  return self.s[-1]
+    def getMin(self): return self.m[-1]
+\`\`\`
+All operations O(1).` },
+
+  // ── HEAP ──
+  { keys:['heap','priority queue','k largest','kth largest','top k','merge k sorted','median stream'],
+    ans:`## Heap / Priority Queue
+
+Python uses \`heapq\` — a **min-heap** by default. Negate values for max-heap.
+
+### Kth Largest Element
+\`\`\`python
+import heapq
+def findKthLargest(nums, k):
+    # Keep min-heap of size k; root = kth largest
+    heap = nums[:k]
+    heapq.heapify(heap)
+    for n in nums[k:]:
+        if n > heap[0]:
+            heapq.heapreplace(heap, n)
+    return heap[0]
+# Time: O(n log k)  Space: O(k)
+\`\`\`
+
+### Top K Frequent Elements
+\`\`\`python
+from collections import Counter
+def topKFrequent(nums, k):
+    count = Counter(nums)
+    return heapq.nlargest(k, count, key=count.get)
+# Time: O(n log k)
+\`\`\`
+
+### Median from Data Stream (Two Heaps)
+\`\`\`python
+class MedianFinder:
+    def __init__(self):
+        self.lo = []   # max-heap (negate) — lower half
+        self.hi = []   # min-heap — upper half
+
+    def addNum(self, num):
+        heapq.heappush(self.lo, -num)
+        # Balance: lo top must be <= hi top
+        if self.hi and -self.lo[0] > self.hi[0]:
+            heapq.heappush(self.hi, -heapq.heappop(self.lo))
+        # Size balance
+        if len(self.lo) > len(self.hi)+1:
+            heapq.heappush(self.hi, -heapq.heappop(self.lo))
+        elif len(self.hi) > len(self.lo):
+            heapq.heappush(self.lo, -heapq.heappop(self.hi))
+
+    def findMedian(self):
+        if len(self.lo) > len(self.hi): return -self.lo[0]
+        return (-self.lo[0] + self.hi[0]) / 2
+\`\`\`
+**addNum:** O(log n) | **findMedian:** O(1)` },
+
+  // ── SORTING ──
+  { keys:['merge sort','quick sort','sorting','sort algorithm','counting sort','heap sort','bubble sort','insertion sort'],
+    ans:`## Sorting Algorithms
+
+### Merge Sort — O(n log n) guaranteed
+\`\`\`python
+def mergeSort(arr):
+    if len(arr) <= 1: return arr
+    mid = len(arr)//2
+    L = mergeSort(arr[:mid])
+    R = mergeSort(arr[mid:])
+    return merge(L, R)
+
+def merge(L, R):
+    res, i, j = [], 0, 0
+    while i<len(L) and j<len(R):
+        if L[i] <= R[j]: res.append(L[i]); i+=1
+        else:            res.append(R[j]); j+=1
+    return res + L[i:] + R[j:]
+\`\`\`
+
+### Quick Sort — O(n log n) avg, O(n²) worst
+\`\`\`python
+def quickSort(arr, lo, hi):
+    if lo >= hi: return
+    p = partition(arr, lo, hi)
+    quickSort(arr, lo, p-1)
+    quickSort(arr, p+1, hi)
+
+def partition(arr, lo, hi):
+    pivot = arr[hi]; i = lo
+    for j in range(lo, hi):
+        if arr[j] <= pivot:
+            arr[i], arr[j] = arr[j], arr[i]; i+=1
+    arr[i], arr[hi] = arr[hi], arr[i]
+    return i
+\`\`\`
+
+| Algorithm | Best | Avg | Worst | Space | Stable |
+|---|---|---|---|---|---|
+| Merge Sort | n log n | n log n | n log n | O(n) | ✅ |
+| Quick Sort | n log n | n log n | n² | O(log n) | ❌ |
+| Heap Sort  | n log n | n log n | n log n | O(1) | ❌ |
+| Counting   | n+k | n+k | n+k | O(k) | ✅ |` },
+
+  // ── GREEDY ──
+  { keys:['greedy','activity selection','interval','meeting rooms','jump game','gas station'],
+    ans:`## Greedy Algorithms
+
+**Strategy:** Make the locally optimal choice at each step, trusting it leads to global optimum.
+
+### Activity Selection / Meeting Rooms
+\`\`\`python
+# Can attend all meetings?
+def canAttendMeetings(intervals):
+    intervals.sort(key=lambda x: x[0])   # sort by start
+    for i in range(1, len(intervals)):
+        if intervals[i][0] < intervals[i-1][1]:
+            return False     # overlap
+    return True
+
+# Minimum meeting rooms needed
+import heapq
+def minMeetingRooms(intervals):
+    intervals.sort(key=lambda x: x[0])
+    heap = []    # end times of active meetings
+    for s, e in intervals:
+        if heap and heap[0] <= s:
+            heapq.heapreplace(heap, e)   # reuse room
+        else:
+            heapq.heappush(heap, e)      # new room
+    return len(heap)
+\`\`\`
+
+### Jump Game
+\`\`\`python
+def canJump(nums):
+    max_reach = 0
+    for i, n in enumerate(nums):
+        if i > max_reach: return False
+        max_reach = max(max_reach, i + n)
+    return True
+\`\`\`
+
+### Key greedy patterns:
+- Sort by end time → interval scheduling
+- Sort by ratio → fractional knapsack
+- Always pick smallest/largest → priority queue
+- Proof: exchange argument (swapping two choices doesn't improve result)` },
+
+  // ── TRIE ──
+  { keys:['trie','prefix tree','autocomplete','word search trie','implement trie'],
+    ans:`## Trie (Prefix Tree)
+
+Used for: autocomplete, spell check, prefix matching, IP routing.
+
+\`\`\`python
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end   = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                node.children[ch] = TrieNode()
+            node = node.children[ch]
+        node.is_end = True
+
+    def search(self, word):
+        node = self.root
+        for ch in word:
+            if ch not in node.children: return False
+            node = node.children[ch]
+        return node.is_end
+
+    def startsWith(self, prefix):
+        node = self.root
+        for ch in prefix:
+            if ch not in node.children: return False
+            node = node.children[ch]
+        return True            # any word starts with this prefix
+\`\`\`
+
+| Operation | Time | Space |
+|---|---|---|
+| Insert  | O(m) | O(m) |
+| Search  | O(m) | O(1) |
+| Prefix  | O(m) | O(1) |
+
+m = length of word. Total space for n words of avg len m: O(n·m).
+
+**Tip:** Replace \`children = {}\` with \`children = [None]*26\` for faster access when only lowercase letters.` },
+
+  // ── BIT MANIPULATION ──
+  { keys:['bit','bitwise','xor','bitmask','single number','count bits','power of two','bit manipulation'],
+    ans:`## Bit Manipulation — Essential Tricks
+
+\`\`\`
+n & (n-1)   → clears lowest set bit   (check if power of 2: n & n-1 == 0)
+n & (-n)    → isolates lowest set bit
+n ^ n = 0   → XOR same = 0  (find single number in array)
+n ^ 0 = n   → XOR with 0 unchanged
+a ^ b ^ a = b  → XOR is commutative & associative
+n >> 1      → divide by 2
+n << 1      → multiply by 2
+n | (1<<k)  → set k-th bit
+n & ~(1<<k) → clear k-th bit
+(n >> k) & 1 → check k-th bit
+\`\`\`
+
+### Single Number (every element appears twice except one)
+\`\`\`python
+def singleNumber(nums):
+    res = 0
+    for n in nums: res ^= n
+    return res    # pairs cancel out via XOR
+\`\`\`
+
+### Count Set Bits (Hamming Weight)
+\`\`\`python
+def hammingWeight(n):
+    count = 0
+    while n:
+        n &= n-1    # clear lowest set bit
+        count += 1
+    return count
+\`\`\`
+
+### Subsets using Bitmask
+\`\`\`python
+def subsets(nums):
+    n, res = len(nums), []
+    for mask in range(1 << n):   # 0 to 2^n - 1
+        sub = [nums[i] for i in range(n) if mask & (1<<i)]
+        res.append(sub)
+    return res
+\`\`\`
+**Time:** O(2^n)` },
+
+  // ── RECURSION ──
+  { keys:['recursion','factorial','tower of hanoi','recursive','base case'],
+    ans:`## Recursion — How to Think Recursively
+
+**3 Laws of Recursion:**
+1. Must have a **base case** (stopping condition)
+2. Must **change state** and move toward base case
+3. Must **call itself** recursively
+
+### Template
+\`\`\`python
+def solve(problem):
+    # 1. Base case
+    if problem is simple enough:
+        return direct_solution
+
+    # 2. Recursive case — reduce problem
+    smaller = reduce(problem)
+    sub_result = solve(smaller)
+
+    # 3. Combine sub-result
+    return combine(sub_result, problem)
+\`\`\`
+
+### Factorial
+\`\`\`python
+def factorial(n):
+    if n <= 1: return 1          # base case
+    return n * factorial(n-1)   # recursive case
+\`\`\`
+
+### Tower of Hanoi
+\`\`\`python
+def hanoi(n, src, dst, aux):
+    if n == 1:
+        print(f"Move disk 1 from {src} to {dst}")
+        return
+    hanoi(n-1, src, aux, dst)   # move n-1 disks to aux
+    print(f"Move disk {n} from {src} to {dst}")
+    hanoi(n-1, aux, dst, src)   # move n-1 disks to dst
+# Requires 2^n - 1 moves
+\`\`\`
+
+**Tips:**
+- Draw the recursion tree to visualize
+- Count recursive calls → time complexity
+- Stack depth → space complexity (beware stack overflow for deep recursion)
+- Convert to iteration + explicit stack if depth > 10,000` },
+
+  // ── COMPLEXITY ──
+  { keys:['time complexity','space complexity','big o','o(n)','o(log n)','complexity analysis','asymptotic'],
+    ans:`## Time & Space Complexity — Big O Guide
+
+### Common Complexities (best → worst)
+| Notation | Name | Example |
+|---|---|---|
+| O(1) | Constant | Array access, HashMap get |
+| O(log n) | Logarithmic | Binary search, Heap push |
+| O(n) | Linear | Single loop, BFS/DFS |
+| O(n log n) | Linearithmic | Merge sort, Heap sort |
+| O(n²) | Quadratic | Nested loops, Bubble sort |
+| O(2^n) | Exponential | All subsets, Backtracking |
+| O(n!) | Factorial | All permutations |
+
+### How to calculate
+\`\`\`
+Single loop of n         → O(n)
+Nested loops n×n         → O(n²)
+Loop + binary search     → O(n log n)
+Divide problem by 2 each → O(log n)
+Two independent loops    → O(n) + O(n) = O(n)
+Recursion with branching → O(branches ^ depth)
+\`\`\`
+
+### Space complexity tips
+- Extra array of size n → O(n)
+- Recursion depth d     → O(d) stack space
+- HashMap with n items  → O(n)
+- In-place algorithm    → O(1) extra
+
+### Drop constants & lower-order terms
+\`\`\`
+O(3n + 5)   = O(n)
+O(n² + n)   = O(n²)
+O(2^n + n³) = O(2^n)
+\`\`\`` },
+
+  // FALLBACK
+  { keys:['__default__'],
+    ans:null }
+];
+
+function dsaAnswer(query) {
+  const q = query.toLowerCase();
+
+  // Try to find matching entry
+  for (const entry of DSA_KB) {
+    if (entry.keys[0] === '__default__') continue;
+    if (entry.keys.some(k => q.includes(k))) {
+      return entry.ans;
+    }
+  }
+
+  // Smart fallback — extract key terms and give a helpful response
+  const topics = [
+    ['array','Arrays'],['string','Strings'],['tree','Trees'],
+    ['graph','Graphs'],['dp','Dynamic Programming'],['dynamic','Dynamic Programming'],
+    ['sort','Sorting'],['search','Binary Search'],['hash','Hashing'],
+    ['link','Linked List'],['stack','Stack/Queue'],['heap','Heap'],
+    ['greedy','Greedy'],['backtrack','Backtracking'],['recursi','Recursion'],
+    ['bit','Bit Manipulation'],['trie','Trie'],['pointer','Two Pointers'],
+    ['window','Sliding Window']
+  ];
+
+  let matched = topics.filter(([k])=>q.includes(k)).map(([,v])=>v);
+  const topicHint = matched.length ? `Related topic(s) detected: **${matched.join(', ')}**\n\n` : '';
+
+  return `${topicHint}I have a detailed knowledge base covering these DSA topics — try asking specifically about one:
+
+**Data Structures:**
+Arrays · Strings · Linked List · Stack/Queue · Heap · Trie · Hash Map
+
+**Algorithms:**
+Binary Search · Two Pointers · Sliding Window · Sorting (Merge/Quick)
+BFS/DFS · Dijkstra · Topological Sort · Union-Find
+
+**Techniques:**
+Dynamic Programming · Greedy · Backtracking · Recursion · Bit Manipulation
+
+**Example questions you can ask:**
+- "How does Kadane's algorithm work?"
+- "Explain binary search with code"
+- "What is a sliding window technique?"
+- "How to detect a cycle in a linked list?"
+- "Explain DP knapsack with example"
+- "What is a monotonic stack?"
+- "How does Dijkstra's algorithm work?"
+- "Explain backtracking with subsets example"
+
+Type any of the above and I'll give you a full explanation with code! 🚀`;
+}
+</script>
+</body>
+</html>
